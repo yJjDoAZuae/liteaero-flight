@@ -1,0 +1,82 @@
+
+#pragma once
+
+#include "control/SISOBlock.hpp"
+#include "control/Filter.hpp"
+#include "control/control.hpp"
+#include <Eigen/Dense>
+#include <unsupported/Eigen/MatrixFunctions>  // for Matrix::pow()
+
+namespace Control {
+
+// template <char NUM_STATES=FILTER_MAX_STATES>
+
+class FilterSS2 : public Filter {
+
+public:
+    FilterSS2()
+    {
+        _Phi.setZero();
+        _Gamma.setZero();
+        _H.setZero();
+        _J.setOnes();
+        _x.setZero();
+        _order = 0;
+    }
+
+    FilterSS2(FilterSS2 &filt)
+    {
+        copy(filt);
+    }
+
+    void copy(FilterSS2 &filt);
+
+    // IIR filter design
+    void setLowPassFirstIIR(float dt, float tau);                  // first order low pass filter design
+    void setLowPassSecondIIR(float dt, float wn_rps, float zeta, float tau_zero);  // second order low pass filter design
+    void setHighPassFirstIIR(float dt, float tau);                 // first order high pass filter design
+    void setHighPassSecondIIR(float dt, float wn_rps, float zeta, float c_zero); // second order high pass filter design
+    void setDerivIIR(float dt, float tau);                         // first order derivative + low pass filter design
+    void setNotchSecondIIR(float dt, float wn_rps, float zeta_den, float zeta_num);    // second order notch filter design
+
+    // step the filter
+    float step(float in);
+
+    // reset the fiter based on inputs
+    void resetInput(float in);
+
+    // Reset the filter based on outputs
+    // If dc gain is zero, then the filter is
+    // reset to zero regardless of argument value
+    void resetOutput(float out);
+
+    // dc gain value of the filter
+    float dcGain() const;
+
+    Mat22 Phi() const {return _Phi;}
+    Mat21 Gamma() const {return _Gamma;}
+    Mat12 H() const {return _H;}
+    Mat11 J() const {return _J;}
+    Mat21 x() const {return _x;}
+
+    Eigen::size_t order() const {return _order;}
+
+    Mat22 controlGrammian() const;
+    Mat22 observeGrammian() const;
+
+protected:
+
+    // 2nd order state space realization matrices
+    Mat22 _Phi;
+    Mat21 _Gamma;
+    Mat12 _H;
+    Mat11 _J;
+
+    // 2nd order state vector
+    Mat21 _x;
+
+    Eigen::size_t _order;
+
+};
+
+}
