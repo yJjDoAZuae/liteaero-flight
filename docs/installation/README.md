@@ -85,8 +85,11 @@ PATH="/c/msys64/ucrt64/bin:$PATH" mingw32-make -C build -j$(nproc)
 
 ## 5. Run Tests
 
+PATH must include ucrt64/bin when running ctest. Without it, Windows finds the wrong
+`libstdc++` DLL and every test crashes with an "Entry Point Not Found" dialog box.
+
 ```bash
-ctest --test-dir build --output-on-failure
+PATH="/c/msys64/ucrt64/bin:$PATH" ctest --test-dir build --output-on-failure
 ```
 
 Expected output: all tests pass except the known pre-existing failures documented in

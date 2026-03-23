@@ -40,9 +40,10 @@ PATH="/c/msys64/ucrt64/bin:$PATH" cmake -B build -G "MinGW Makefiles" \
     -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake \
     -DCMAKE_BUILD_TYPE=Release
 
-# Step 3: Build and test:
+# Step 3: Build and test — PATH required for ctest too; without it Windows
+# finds the wrong libstdc++ DLL and every test crashes with a dialog box:
 PATH="/c/msys64/ucrt64/bin:$PATH" mingw32-make -C build
-ctest --test-dir build --output-on-failure
+PATH="/c/msys64/ucrt64/bin:$PATH" ctest --test-dir build --output-on-failure
 ```
 
 **Debug builds** require a separate `conan install` pass with `--settings build_type=Debug`, because the Conan-generated CMakeDeps wraps include directories and library paths in `$<$<CONFIG:Release>:...>` generator expressions that are invisible to Debug builds.
