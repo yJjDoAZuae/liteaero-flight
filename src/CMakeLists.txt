@@ -19,7 +19,7 @@ add_library(liteaero_log STATIC
 add_library(liteaero::log ALIAS liteaero_log)
 target_include_directories(liteaero_log
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
 )
 target_compile_features(liteaero_log PUBLIC cxx_std_17)
@@ -36,16 +36,19 @@ target_link_libraries(liteaero_log
 add_library(liteaero_control INTERFACE)
 add_library(liteaero::control ALIAS liteaero_control)
 target_include_directories(liteaero_control INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 target_compile_features(liteaero_control INTERFACE cxx_std_17)
+# DynamicElement (the base class for all control elements) includes ILogger,
+# so any consumer of liteaero::control must be able to find liteaero/log headers.
+target_link_libraries(liteaero_control INTERFACE liteaero::log)
 
 # --- liteaero::terrain ---
 add_library(liteaero_terrain INTERFACE)
 add_library(liteaero::terrain ALIAS liteaero_terrain)
 target_include_directories(liteaero_terrain INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 target_compile_features(liteaero_terrain INTERFACE cxx_std_17)
@@ -54,7 +57,7 @@ target_compile_features(liteaero_terrain INTERFACE cxx_std_17)
 add_library(liteaero_nav INTERFACE)
 add_library(liteaero::nav ALIAS liteaero_nav)
 target_include_directories(liteaero_nav INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
 target_compile_features(liteaero_nav INTERFACE cxx_std_17)

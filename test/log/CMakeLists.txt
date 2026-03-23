@@ -15,7 +15,7 @@ endif()
 add_executable(liteaero_log_test ${LAF_LOG_TEST_SOURCES})
 
 target_include_directories(liteaero_log_test PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
 
 target_compile_features(liteaero_log_test PRIVATE cxx_std_17)

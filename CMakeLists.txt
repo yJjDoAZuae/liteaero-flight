@@ -77,4 +77,11 @@ endif()
 # ---------------------------------------------------------------------------
 add_subdirectory(proto)
 add_subdirectory(src)
-add_subdirectory(test)
+
+# Tests are only built when liteaero-flight is the top-level CMake project.
+# When consumed via add_subdirectory (e.g., from liteaero-sim during Phase 1
+# migration), tests are skipped — each step's verification runs liteaero-flight
+# tests standalone and liteaero-sim tests in the sim build separately.
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    add_subdirectory(test)
+endif()
