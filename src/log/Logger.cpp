@@ -1,6 +1,6 @@
-#include "logger/Logger.hpp"
+#include <liteaero/log/Logger.hpp>
 
-#include "liteaerosim.pb.h"
+#include "liteaero_flight.pb.h"
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor.pb.h>
 #include "mcap_static.hpp"
@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-namespace liteaerosim::logger {
+namespace liteaero::log {
 
 // ---------------------------------------------------------------------------
 // LogSourceState — shared between Logger::Impl and every LogSource handle.
@@ -83,7 +83,7 @@ void Logger::open(const std::filesystem::path& path, LogFormat /*format*/) {
         throw std::logic_error("Logger::open: session already open");
     }
 
-    mcap::McapWriterOptions opts("liteaerosim");
+    mcap::McapWriterOptions opts("liteaeroflight");
     opts.compression = mcap::Compression::None;
 
     const auto status = _impl->writer.open(path.string(), opts);
@@ -93,8 +93,8 @@ void Logger::open(const std::filesystem::path& path, LogFormat /*format*/) {
 
     // Register the FloatArray schema once; store its ID for addSource().
     const std::string schema_data =
-        buildFileDescriptorSet(las_proto::FloatArray::descriptor());
-    mcap::Schema schema("las_proto.FloatArray", "protobuf",
+        buildFileDescriptorSet(liteaeroflight::FloatArray::descriptor());
+    mcap::Schema schema("liteaeroflight.FloatArray", "protobuf",
                         std::string_view(schema_data));
     _impl->writer.addSchema(schema);
     _impl->float_array_schema_id = schema.id;
@@ -154,7 +154,7 @@ void LogSource::log(double time_s, const std::vector<float>& values) {
         throw std::logic_error("LogSource::log: logger has been closed");
     }
 
-    las_proto::FloatArray msg;
+    liteaeroflight::FloatArray msg;
     for (float v : values) {
         msg.add_values(v);
     }
@@ -180,4 +180,4 @@ const std::string& LogSource::name() const { return _state->name; }
 const std::vector<std::string>& LogSource::channel_names() const { return _state->channel_names; }
 const std::vector<std::string>& LogSource::channel_units() const { return _state->channel_units; }
 
-}  // namespace liteaerosim::logger
+}  // namespace liteaero::log

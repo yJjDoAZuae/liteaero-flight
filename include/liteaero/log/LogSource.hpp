@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace liteaerosim::logger {
+namespace liteaero::log {
 
 // Forward declaration — full definition lives in Logger.cpp.
 struct LogSourceState;
@@ -31,4 +31,4 @@ private:
     std::shared_ptr<LogSourceState> _state;
 };
 
-}  // namespace liteaerosim::logger
+}  // namespace liteaero::log

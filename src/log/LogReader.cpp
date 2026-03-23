@@ -1,6 +1,6 @@
-#include "logger/LogReader.hpp"
+#include <liteaero/log/LogReader.hpp>
 
-#include "liteaerosim.pb.h"
+#include "liteaero_flight.pb.h"
 #include "mcap_static.hpp"
 
 #include <fstream>
@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace liteaerosim::logger {
+namespace liteaero::log {
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -97,7 +97,7 @@ void LogReader::open(const std::filesystem::path& path) {
     for (auto it = view.begin(); it != view.end(); ++it) {
         const auto& msg = it->message;
 
-        las_proto::FloatArray arr;
+        liteaeroflight::FloatArray arr;
         if (!arr.ParseFromArray(static_cast<const void*>(msg.data),
                                 static_cast<int>(msg.dataSize))) {
             continue;  // skip malformed records
@@ -164,4 +164,4 @@ void LogReader::close() {
     _impl->open_flag  = false;
 }
 
-}  // namespace liteaerosim::logger
+}  // namespace liteaero::log

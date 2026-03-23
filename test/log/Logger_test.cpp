@@ -2,15 +2,15 @@
 // Covers: session lifecycle, round-trip value recovery, error on post-close log(),
 // high-volume smoke test, multi-source registration, and source descriptor fidelity.
 
-#include "logger/Logger.hpp"
-#include "logger/LogReader.hpp"
+#include <liteaero/log/Logger.hpp>
+#include <liteaero/log/LogReader.hpp>
 #include <gtest/gtest.h>
 #include <filesystem>
 #include <string>
 #include <vector>
 
 namespace fs = std::filesystem;
-using namespace liteaerosim::logger;
+using namespace liteaero::log;
 
 namespace {
 

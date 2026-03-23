@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace liteaerosim::logger {
+namespace liteaero::log {
 
 /// Post-session reader for MCAP log files produced by Logger.
 ///
@@ -53,4 +53,4 @@ private:
     std::unique_ptr<Impl> _impl;
 };
 
-}  // namespace liteaerosim::logger
+}  // namespace liteaero::log

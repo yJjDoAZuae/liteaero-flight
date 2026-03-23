@@ -7,3 +7,11 @@
 syntax = "proto3";
 
 package liteaeroflight;
+
+// ---------------------------------------------------------------------------
+// FloatArray — lightweight log message for float-vector log sources.
+// Used by LogSource as the MCAP message schema.
+// ---------------------------------------------------------------------------
+message FloatArray {
+    repeated float values = 1;
+}

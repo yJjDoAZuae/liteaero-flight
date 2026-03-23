@@ -3,7 +3,7 @@
 #include <string_view>
 #include <nlohmann/json.hpp>
 
-namespace liteaerosim {
+namespace liteaero::log {
 
 /// Logging sink interface injected into DynamicElement components.
 /// Implementations write to CSV, binary ring buffer, in-memory store, etc.
@@ -19,4 +19,4 @@ public:
     virtual void log(std::string_view channel, const nlohmann::json& snapshot) = 0;
 };
 
-} // namespace liteaerosim
+}  // namespace liteaero::log

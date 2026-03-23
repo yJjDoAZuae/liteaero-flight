@@ -1,12 +1,12 @@
 #pragma once
 
-#include "logger/LogSource.hpp"
+#include <liteaero/log/LogSource.hpp>
 #include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
 
-namespace liteaerosim::logger {
+namespace liteaero::log {
 
 enum class LogFormat { Mcap, Csv };
 
@@ -47,4 +47,4 @@ private:
     std::unique_ptr<Impl> _impl;
 };
 
-}  // namespace liteaerosim::logger
+}  // namespace liteaero::log

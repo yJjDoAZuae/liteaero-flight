@@ -1,6 +1,5 @@
 # ---------------------------------------------------------------------------
 # liteaero::log tests
-# Activated in Step 3 (log namespace migration).
 # ---------------------------------------------------------------------------
 
 file(GLOB LAF_LOG_TEST_SOURCES CONFIGURE_DEPENDS
