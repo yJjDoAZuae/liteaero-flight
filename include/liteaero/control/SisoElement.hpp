@@ -1,8 +1,8 @@
 #pragma once
 
-#include "DynamicElement.hpp"
+#include <liteaero/control/DynamicElement.hpp>
 
-namespace liteaerosim {
+namespace liteaero::control {
 
 /// Abstract base for all single-input, single-output dynamic elements.
 ///
@@ -41,4 +41,4 @@ protected:
     void onReset() override {}
 };
 
-} // namespace liteaerosim
+} // namespace liteaero::control

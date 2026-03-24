@@ -1,6 +1,6 @@
-#include "SisoElement.hpp"
+#include <liteaero/control/SisoElement.hpp>
 
-namespace liteaerosim {
+namespace liteaero::control {
 
 float SisoElement::step(float u) {
     out_ = onStep(u);  // in_ still holds previous value during onStep
@@ -17,4 +17,4 @@ void SisoElement::reset() {
     onReset();
 }
 
-} // namespace liteaerosim
+} // namespace liteaero::control

@@ -33,16 +33,25 @@ target_link_libraries(liteaero_log
 )
 
 # --- liteaero::control ---
-add_library(liteaero_control INTERFACE)
-add_library(liteaero::control ALIAS liteaero_control)
-target_include_directories(liteaero_control INTERFACE
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+add_library(liteaero_control STATIC
+    control/DynamicElement.cpp
+    control/SisoElement.cpp
 )
-target_compile_features(liteaero_control INTERFACE cxx_std_17)
-# DynamicElement (the base class for all control elements) includes ILogger,
-# so any consumer of liteaero::control must be able to find liteaero/log headers.
-target_link_libraries(liteaero_control INTERFACE liteaero::log)
+add_library(liteaero::control ALIAS liteaero_control)
+target_include_directories(liteaero_control
+    PUBLIC
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
+target_compile_features(liteaero_control PUBLIC cxx_std_17)
+target_link_libraries(liteaero_control
+    PUBLIC
+        liteaero::log
+        nlohmann_json::nlohmann_json
+    PRIVATE
+        liteaero_flight_proto
+        protobuf::libprotobuf
+)
 
 # --- liteaero::terrain ---
 add_library(liteaero_terrain INTERFACE)

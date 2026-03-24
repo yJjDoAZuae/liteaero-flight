@@ -1,9 +1,9 @@
-#include "DynamicElement.hpp"
+#include <liteaero/control/DynamicElement.hpp>
 
 #include <stdexcept>
 #include <string>
 
-namespace liteaerosim {
+namespace liteaero::control {
 
 void DynamicElement::initialize(const nlohmann::json& config) {
     validateSchema(config);
@@ -26,7 +26,7 @@ void DynamicElement::deserializeJson(const nlohmann::json& state) {
     onDeserializeJson(state);
 }
 
-void DynamicElement::attachLogger(ILogger* logger) noexcept {
+void DynamicElement::attachLogger(liteaero::log::ILogger* logger) noexcept {
     logger_ = logger;
 }
 
@@ -44,4 +44,4 @@ void DynamicElement::validateSchema(const nlohmann::json& state) const {
     }
 }
 
-} // namespace liteaerosim
+} // namespace liteaero::control
