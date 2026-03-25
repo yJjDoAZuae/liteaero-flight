@@ -79,10 +79,22 @@ target_include_directories(liteaero_terrain INTERFACE
 target_compile_features(liteaero_terrain INTERFACE cxx_std_17)
 
 # --- liteaero::nav ---
-add_library(liteaero_nav INTERFACE)
-add_library(liteaero::nav ALIAS liteaero_nav)
-target_include_directories(liteaero_nav INTERFACE
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+add_library(liteaero_nav STATIC
+    nav/WGS84.cpp
+    nav/KinematicStateUtil.cpp
 )
-target_compile_features(liteaero_nav INTERFACE cxx_std_17)
+add_library(liteaero::nav ALIAS liteaero_nav)
+target_include_directories(liteaero_nav
+    PUBLIC
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
+target_compile_features(liteaero_nav PUBLIC cxx_std_17)
+target_link_libraries(liteaero_nav
+    PUBLIC
+        Eigen3::Eigen
+        nlohmann_json::nlohmann_json
+    PRIVATE
+        liteaero_flight_proto
+        protobuf::libprotobuf
+)

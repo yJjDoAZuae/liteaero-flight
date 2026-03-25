@@ -1,11 +1,12 @@
 # ---------------------------------------------------------------------------
 # liteaero::nav tests
-# Activated in Step 5 (nav namespace migration).
+# Activated in Step 7 (KinematicStateSnapshot and WGS84 migration).
 # ---------------------------------------------------------------------------
 
-# Nav tests are not yet ready to build — WGS84 and nav headers have not been
-# migrated to liteaero-flight. Add sources here in the nav migration step.
-set(LAF_NAV_TEST_SOURCES)
+set(LAF_NAV_TEST_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/WGS84_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/KinematicStateSnapshot_test.cpp"
+)
 
 if(NOT LAF_NAV_TEST_SOURCES)
     message(STATUS "liteaero_nav_test: no test sources found — skipping")

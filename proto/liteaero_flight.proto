@@ -15,3 +15,47 @@ package liteaeroflight;
 message FloatArray {
     repeated float values = 1;
 }
+
+// ---------------------------------------------------------------------------
+// Shared geometry types
+// ---------------------------------------------------------------------------
+
+message Vector3f {
+    float x = 1;
+    float y = 2;
+    float z = 3;
+}
+
+message Quaternionf {
+    float w = 1;
+    float x = 2;
+    float y = 3;
+    float z = 4;
+}
+
+// ---------------------------------------------------------------------------
+// KinematicStateSnapshot — shared flight/sim interface type.
+// Defined in Step 7 of the migration plan.
+// ---------------------------------------------------------------------------
+
+message GeodeticPosition {
+    double latitude_rad  = 1;
+    double longitude_rad = 2;
+    float  altitude_m    = 3;
+}
+
+message KinematicStateSnapshot {
+    int32            schema_version        = 1;
+    double           time_s                = 2;
+    GeodeticPosition position              = 3;
+    Vector3f         velocity_ned_mps      = 4;
+    Vector3f         acceleration_ned_mps2 = 5;
+    Quaternionf      q_nw                  = 6;
+    Vector3f         rates_body_rps        = 7;
+    float            alpha_rad             = 8;
+    float            beta_rad              = 9;
+    float            alpha_dot_rad_s       = 10;
+    float            beta_dot_rad_s        = 11;
+    float            roll_rate_wind_rad_s  = 12;
+    Vector3f         wind_ned_mps          = 13;
+}

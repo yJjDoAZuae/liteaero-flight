@@ -1,107 +1,77 @@
 #pragma once
 
-#ifndef WGS84_HPP
-#define WGS84_HPP
+#include <liteaero/nav/GeodeticPosition.hpp>
+#include <Eigen/Geometry>
 
-// WGS84 ellipsoid quantities and functions
+namespace liteaero::nav::WGS84 {
 
-#include <Eigen/Dense>
+// ---------------------------------------------------------------------------
+// Defining ellipsoid constants (WGS84 standard)
+// ---------------------------------------------------------------------------
 
-class WGS84_Datum {
+inline constexpr double kA_m       = 6378137.0;          ///< Semi-major axis, m
+inline constexpr double kFinv      = 298.257223563;       ///< Inverse flattening
+inline constexpr double kGM        = 3.986004418e14;      ///< Gravitational constant, m³/s²
+inline constexpr double kOmega_rps = 7.2921151467e-5;     ///< Earth rotation rate, rad/s
 
-    private:
+// ---------------------------------------------------------------------------
+// Radii of curvature
+// ---------------------------------------------------------------------------
 
-        float _height_WGS84_m;
-        double _latitudeGeodetic_rad;
-        double _longitude_rad;
+/// Meridional radius of curvature (north-south), m.
+double meridionalRadius(double latitude_rad);
 
-    public:
+/// Prime vertical radius of curvature, m.
+double primeVerticalRadius(double latitude_rad);
 
-        // defining parameters
-        static const double a; // m, major axis
-        static const double finv; // inverse of flattening
-        static const double GM; // Gravitational constant
-        static const double omega; // earth rotation rate rad/sec
+/// Effective radius for north motion (= meridional radius), m.
+double northRadius(const GeodeticPosition& p);
 
-        // derived parameters
-        static const double E; // m, Linear eccentricity
-        static const double e2; // 6.69437999014e-3; // First eccentricity squared
-        static const double b; // 6356752.314245;
-        static const double f; // flattening
-        static const double e; // First eccentricity
+/// Effective radius for east motion (= prime vertical * cos(lat)), m.
+double eastRadius(const GeodeticPosition& p);
 
-        WGS84_Datum() :
-            _height_WGS84_m(0),
-            _latitudeGeodetic_rad(0),
-            _longitude_rad(0)
-         {};
-        
-        ~WGS84_Datum() {};
+// ---------------------------------------------------------------------------
+// Kinematic rates
+// ---------------------------------------------------------------------------
 
-        // setters and getters
-        void setHeight_WGS84_m(float h);
-        float height_WGS84_m() const { return _height_WGS84_m; }
-        void setLatitudeGeodetic_rad(double lat);
-        double latitudeGeodetic_rad() const { return _latitudeGeodetic_rad; }
-        void setLongitude_rad(double lon);
-        double longitude_rad() const { return _longitude_rad; }
+/// Geodetic latitude rate, rad/s.
+double latitudeRate_rad_s(const GeodeticPosition& p, float v_north_mps);
 
-        double northRadius() const;
-        double eastRadius() const;
+/// Longitude rate, rad/s.
+double longitudeRate_rad_s(const GeodeticPosition& p, float v_east_mps);
 
-        double meridionalRadius() const;
-        double primeVerticalRadius() const;
-        double skewRadius(double azimuth_rad) const;
-        double latitudeRate(double Vnorth) const;
-        double longitudeRate(double Veast) const;
-        double horizonRate(double Vnorth, double Veast) const;
+/// Angular rate of NED frame w.r.t. ECEF due to transport over ellipsoid,
+/// expressed in NED frame, rad/s.
+Eigen::Vector3d transportRate(const GeodeticPosition& p, float v_north_mps, float v_east_mps);
 
-        Eigen::Vector3d transportRate(double Vnorth, double Veast) const;
+// ---------------------------------------------------------------------------
+// Gravity and Earth rate
+// ---------------------------------------------------------------------------
 
-        // gravity model
-        double gravityMagnitude_mps2() const;
+/// Gravity magnitude (Somigliana model), m/s².
+double gravity_mps2(const GeodeticPosition& p);
 
-        // earth rate
-        Eigen::Vector3d omega_ie_n() const;
+/// Earth rotation rate expressed in NED frame, rad/s.
+Eigen::Vector3d omega_ie_n(const GeodeticPosition& p);
 
-        // JSON print
-        void printJSON();
+// ---------------------------------------------------------------------------
+// ECEF conversions
+// ---------------------------------------------------------------------------
 
-        // Eigen getters
-        Eigen::Vector3d ECEF() const;
-        Eigen::Quaterniond qne() const;
-        Eigen::Vector3d LLH() const;
-        Eigen::Matrix3d Cne() const;
+/// Convert geodetic position to ECEF, m.
+Eigen::Vector3d toECEF(const GeodeticPosition& p);
 
-        // Eigen setters
-        void setECEF(const Eigen::Vector3d& ecefDatum);
-        void setQne(const Eigen::Quaterniond& qneDatum);
-        void setLLH(const Eigen::Vector3d& llhDatum);
-        void setCne(const Eigen::Matrix3d& CneDatum);
+/// Convert ECEF position to geodetic (Newton-Raphson iteration).
+GeodeticPosition fromECEF(const Eigen::Vector3d& ecef);
 
-        // Rotation from NED to Navigation frame, if datum is provided with a wander angle
-        static Eigen::Quaterniond NED2Nav(const Eigen::Quaterniond& qneDatum);
+// ---------------------------------------------------------------------------
+// NED-to-ECEF rotation
+// ---------------------------------------------------------------------------
 
-        // align qne to north, normalize, and enforce positive scalar part
-        static Eigen::Quaterniond qne_fix(const Eigen::Quaterniond& qneDatum);
+/// NED-to-ECEF rotation quaternion (q_ne: maps vectors from NED to ECEF).
+Eigen::Quaterniond qne(const GeodeticPosition& p);
 
-    private:
+/// Recover geodetic position from q_ne quaternion.
+GeodeticPosition fromQne(const Eigen::Quaterniond& q_ne);
 
-        // datum conversion from ECEF
-        static void ECEF2LatHeight(const Eigen::Vector3d& ecefDatum, double* latitude_geodetic_rad, float* height_WGS84_m);
-        static void ECEF2Lon(const Eigen::Vector3d& ecefDatum, double* longitude_rad);
-
-        // to/from navigation frame quaternion
-        static void qne2LatLon(const Eigen::Quaterniond& q_ne, double* latitude_geodetic_rad, double* longitude_rad);
-        static void latLon2qne(double latitude_geodetic_rad, double longitude_rad, Eigen::Quaterniond& q_ne);
-
-        // to/from navigation frame direction cosine matrix
-        static void Cne2LatLon(const Eigen::Matrix3d& Cne, double* latitude_geodetic_rad, double* longitude_rad);
-        static void latLon2Cne(double latitude_geodetic_rad, double longitude_rad, Eigen::Matrix3d& Cne);
-
-        // datum conversion to ECEF
-        static void latLonHeight2ECEF(double latitude_geodetic_rad, double longitude_rad, float height_WGS84_m, Eigen::Vector3d& ecef);
-
-};
-
-#endif // WGS84_HPP
+} // namespace liteaero::nav::WGS84
