@@ -1,10 +1,10 @@
 #pragma once
 
-#include "SisoElement.hpp"
+#include <liteaero/control/SisoElement.hpp>
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
-class Unwrap : public liteaerosim::SisoElement {
+class Unwrap : public SisoElement {
 public:
     /// Warm-start: set input, output, and reference to u.
     void resetTo(float u) { in_ = u; out_ = u; ref_ = u; }
@@ -31,4 +31,4 @@ private:
     float ref_ = 0.0f;
 };
 
-} // namespace liteaerosim::control
+} // namespace liteaero::control

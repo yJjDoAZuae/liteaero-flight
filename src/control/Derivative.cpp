@@ -1,6 +1,6 @@
-#include "control/Derivative.hpp"
+#include <liteaero/control/Derivative.hpp>
 
-using namespace liteaerosim::control;
+using namespace liteaero::control;
 
 float Derivative::onStep(float u)
 {

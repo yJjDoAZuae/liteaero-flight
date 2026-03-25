@@ -1,10 +1,18 @@
-#include "control/Unwrap.hpp"
-#include "math/math_util.hpp"
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <liteaero/control/Unwrap.hpp>
 
-using namespace liteaerosim::control;
+using namespace liteaero::control;
+
+static float wrapToPi(float angle)
+{
+    float a = std::fmod(angle + static_cast<float>(M_PI), 2.0f * static_cast<float>(M_PI));
+    if (a < 0.0f) a += 2.0f * static_cast<float>(M_PI);
+    return a - static_cast<float>(M_PI);
+}
 
 float Unwrap::onStep(float u) {
-    float y = ref_ + MathUtil::wrapToPi(u - ref_);
+    float y = ref_ + wrapToPi(u - ref_);
     ref_ = y;
     return y;
 }

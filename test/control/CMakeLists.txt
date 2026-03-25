@@ -15,6 +15,15 @@ set(LAF_CONTROL_TEST_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/FilterTF_test.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/FilterTF2_test.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/Limit_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Antiwindup_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Integrator_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Derivative_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/RateLimit_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Unwrap_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Gain_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/SISOPIDFF_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/RectilinearTable_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TableAxis_test.cpp"
 )
 
 if(NOT LAF_CONTROL_TEST_SOURCES)

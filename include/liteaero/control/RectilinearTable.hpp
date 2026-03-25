@@ -1,6 +1,6 @@
 #pragma once
 
-#include "control/TableAxis.hpp"
+#include <liteaero/control/TableAxis.hpp>
 
 #include <string>
 #include <sstream>
@@ -10,7 +10,7 @@
 
 using json = nlohmann::json;
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
 template <typename Tv, typename Ta, uint32_t NumAxes>
 class RectilinearTable {

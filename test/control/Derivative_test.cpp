@@ -1,10 +1,10 @@
 #define _USE_MATH_DEFINES
-#include "control/Derivative.hpp"
+#include <liteaero/control/Derivative.hpp>
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 
-using namespace liteaerosim::control;
+using namespace liteaero::control;
 
 TEST(DerivativeTest, Instantiation00) {
     Derivative D;

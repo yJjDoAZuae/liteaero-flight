@@ -1,9 +1,9 @@
-#include "control/SISOPIDFF.hpp"
+#include <liteaero/control/SISOPIDFF.hpp>
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 
-using namespace liteaerosim::control;
+using namespace liteaero::control;
 
 TEST(SISOPIDFFTest, SchemaVersionAndTypeName) {
     SISOPIDFF pid;

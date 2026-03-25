@@ -1,5 +1,5 @@
 #define _USE_MATH_DEFINES
-#include "control/TableAxis.hpp"
+#include <liteaero/control/TableAxis.hpp>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <fstream>
@@ -8,7 +8,7 @@
 
 using json = nlohmann::json;
 
-using namespace liteaerosim::control;
+using namespace liteaero::control;
 
 TEST(TableAxisTest, Instantiation00) {
 

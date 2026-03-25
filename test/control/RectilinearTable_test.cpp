@@ -1,5 +1,5 @@
 #define _USE_MATH_DEFINES
-#include "control/RectilinearTable.hpp"
+#include <liteaero/control/RectilinearTable.hpp>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <fstream>
@@ -7,7 +7,7 @@
 
 using json = nlohmann::json;
 
-using namespace liteaerosim::control;
+using namespace liteaero::control;
 
 TEST(RectilinearTableTest, Instantiation00) {
 

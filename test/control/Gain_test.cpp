@@ -1,8 +1,8 @@
 #define _USE_MATH_DEFINES
-#include "control/Gain.hpp"
+#include <liteaero/control/Gain.hpp>
 #include <gtest/gtest.h>
 
-using namespace liteaerosim::control;
+using namespace liteaero::control;
 
 TEST(GainTest, Instantiation00) {
     Gain<float, 3> K;

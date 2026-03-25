@@ -7,7 +7,7 @@
 
 using json = nlohmann::json;
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
 template <typename Ta>
 class TableAxis {

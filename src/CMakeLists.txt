@@ -45,6 +45,12 @@ add_library(liteaero_control STATIC
     control/FilterFIR.cpp
     control/FilterSS.cpp
     control/Limit.cpp
+    control/Antiwindup.cpp
+    control/Integrator.cpp
+    control/Derivative.cpp
+    control/RateLimit.cpp
+    control/Unwrap.cpp
+    control/SISOPIDFF.cpp
 )
 add_library(liteaero::control ALIAS liteaero_control)
 target_include_directories(liteaero_control

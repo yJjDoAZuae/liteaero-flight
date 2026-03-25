@@ -1,10 +1,16 @@
 #define _USE_MATH_DEFINES
 
 #include <cmath>
-#include "control/SISOPIDFF.hpp"
-#include "math/math_util.hpp"
+#include <liteaero/control/SISOPIDFF.hpp>
 
-using namespace liteaerosim::control;
+using namespace liteaero::control;
+
+static float wrapToPi(float angle)
+{
+    float a = std::fmod(angle + static_cast<float>(M_PI), 2.0f * static_cast<float>(M_PI));
+    if (a < 0.0f) a += 2.0f * static_cast<float>(M_PI);
+    return a - static_cast<float>(M_PI);
+}
 
 SISOPIDFF::SISOPIDFF() {}
 
@@ -104,7 +110,7 @@ float SISOPIDFF::step(float command, float measurement, float measurement_deriva
 
     if (unwrap_inputs_) {
 
-        error_unfiltered = MathUtil::wrapToPi(error_unfiltered);
+        error_unfiltered = wrapToPi(error_unfiltered);
 
         // We need to support the following for angular coordinates:
         //
@@ -144,8 +150,8 @@ float SISOPIDFF::step(float command, float measurement, float measurement_deriva
 
         if ((fabs(error_unfiltered) > 0.0f)
             && (fabs(error_signal_.out()) > 0.0f)
-            && error_unfiltered * MathUtil::wrapToPi(error_signal_.out()) < 0.0f
-            && (error_unfiltered * MathUtil::wrapToPi(error_unfiltered - error_signal_.out()) <= 0.0f)) {
+            && error_unfiltered * wrapToPi(error_signal_.out()) < 0.0f
+            && (error_unfiltered * wrapToPi(error_unfiltered - error_signal_.out()) <= 0.0f)) {
 
             // The error inputs have crossed the pi boundary, reset the filter to close
             // to the nearest pi limit
@@ -169,7 +175,7 @@ float SISOPIDFF::step(float command, float measurement, float measurement_deriva
             // but the value limit will clip the errSignal output (and state) to -pi/4.
 
             error_signal_.resetToInput(pi_bound_nearest
-                                       + MathUtil::wrapToPi(error_signal_.out() - pi_bound_nearest));
+                                       + wrapToPi(error_signal_.out() - pi_bound_nearest));
         }
 
         error_signal_.step(error_unfiltered);

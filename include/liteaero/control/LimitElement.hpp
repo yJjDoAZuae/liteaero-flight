@@ -1,14 +1,14 @@
 #pragma once
 
-#include "SisoElement.hpp"
+#include <liteaero/control/SisoElement.hpp>
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
 /// Abstract base for standalone SISO limit/clamp elements.
 ///
 /// Extends SisoElement with limit-specific query and control methods.
 /// All concrete limiters (Limit, RateLimit, …) derive from this.
-class LimitElement : public liteaerosim::SisoElement {
+class LimitElement : public SisoElement {
 public:
     /// Enable both lower and upper limits.
     void enable() { enableLower(); enableUpper(); }
@@ -40,4 +40,4 @@ public:
     bool isLimited() const { return isLimitedLower() || isLimitedUpper(); }
 };
 
-} // namespace liteaerosim::control
+} // namespace liteaero::control

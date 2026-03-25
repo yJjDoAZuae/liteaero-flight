@@ -1,8 +1,8 @@
-#include "control/Antiwindup.hpp"
+#include <liteaero/control/Antiwindup.hpp>
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 
-using namespace liteaerosim::control;
+using namespace liteaero::control;
 using Dir = AntiwindupConfig::Direction;
 
 // ── NullDirection ────────────────────────────────────────────────────────────

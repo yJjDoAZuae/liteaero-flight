@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
 /// Simple gain element with template parameters reserved for future scheduling design.
 ///
@@ -24,4 +24,4 @@ private:
     T value_;
 };
 
-}  // namespace liteaerosim::control
+}  // namespace liteaero::control

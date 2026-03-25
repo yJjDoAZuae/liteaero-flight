@@ -1,14 +1,14 @@
 #pragma once
 
-#include "control/control.hpp"
-#include "SisoElement.hpp"
-#include "control/Limit.hpp"
-#include "control/Antiwindup.hpp"
+#include <liteaero/control/control.hpp>
+#include <liteaero/control/SisoElement.hpp>
+#include <liteaero/control/Limit.hpp>
+#include <liteaero/control/Antiwindup.hpp>
 #include <vector>
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
-class Integrator : public liteaerosim::SisoElement {
+class Integrator : public SisoElement {
 public:
     Integrator() :
         dt_s_(1.0f),
@@ -39,4 +39,4 @@ private:
     DiscretizationMethod method_;
 };
 
-} // namespace liteaerosim::control
+} // namespace liteaero::control

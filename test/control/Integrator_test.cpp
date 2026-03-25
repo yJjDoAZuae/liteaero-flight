@@ -1,10 +1,10 @@
 #define _USE_MATH_DEFINES
-#include "control/Integrator.hpp"
+#include <liteaero/control/Integrator.hpp>
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 
-using namespace liteaerosim::control;
+using namespace liteaero::control;
 
 TEST(IntegratorTest, Instantiation00) {
     Integrator I;
@@ -54,7 +54,7 @@ TEST(IntegratorTest, SchemaVersionMismatch) {
 }
 
 TEST(IntegratorTest, Integrator_FreezesWhenAwActive) {
-    using Dir = liteaerosim::control::AntiwindupConfig::Direction;
+    using Dir = liteaero::control::AntiwindupConfig::Direction;
     Integrator I;
     I.initialize({{"schema_version", 1}, {"dt_s", 0.1f}, {"method", 0}});
 
@@ -78,7 +78,7 @@ TEST(IntegratorTest, Integrator_FreezesWhenAwActive) {
 }
 
 TEST(IntegratorTest, Integrator_JsonRoundTrip_IncludesAw) {
-    using Dir = liteaerosim::control::AntiwindupConfig::Direction;
+    using Dir = liteaero::control::AntiwindupConfig::Direction;
     Integrator I;
     I.initialize({{"schema_version", 1}, {"dt_s", 0.1f}, {"method", 0}});
 

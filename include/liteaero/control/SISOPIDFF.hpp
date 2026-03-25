@@ -1,14 +1,14 @@
 #pragma once
 
-#include "DynamicElement.hpp"
-#include "control/control.hpp"
-#include "control/Gain.hpp"
-#include "control/FilterSS2Clip.hpp"
-#include "control/Integrator.hpp"
-#include "control/Derivative.hpp"
-#include "control/Unwrap.hpp"
+#include <liteaero/control/DynamicElement.hpp>
+#include <liteaero/control/control.hpp>
+#include <liteaero/control/Gain.hpp>
+#include <liteaero/control/FilterSS2Clip.hpp>
+#include <liteaero/control/Integrator.hpp>
+#include <liteaero/control/Derivative.hpp>
+#include <liteaero/control/Unwrap.hpp>
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
 /// Single-input single-output PID with feedforward.
 ///
@@ -18,7 +18,7 @@ namespace liteaerosim::control {
 /// The six FilterSS2Clip members, Integrator, Derivative, and two Unwrap
 /// members each carry their own serializable state. SISOPIDFF coordinates
 /// their lifecycle and exposes a composite snapshot.
-class SISOPIDFF : public liteaerosim::DynamicElement {
+class SISOPIDFF : public DynamicElement {
 public:
     SISOPIDFF();
     SISOPIDFF(const SISOPIDFF& other);
@@ -96,4 +96,4 @@ private:
     bool unwrap_inputs_ = false;
 };
 
-}  // namespace liteaerosim::control
+}  // namespace liteaero::control

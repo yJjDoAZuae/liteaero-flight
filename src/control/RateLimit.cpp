@@ -1,6 +1,6 @@
-#include "control/RateLimit.hpp"
+#include <liteaero/control/RateLimit.hpp>
 
-using namespace liteaerosim::control;
+using namespace liteaero::control;
 
 void RateLimit::setLower(float lim)
 {

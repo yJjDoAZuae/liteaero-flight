@@ -1,6 +1,6 @@
-#include "control/Integrator.hpp"
+#include <liteaero/control/Integrator.hpp>
 
-using namespace liteaerosim::control;
+using namespace liteaero::control;
 
 float Integrator::onStep(float u)
 {

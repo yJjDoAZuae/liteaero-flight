@@ -2,7 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
 struct AntiwindupConfig {
     enum class Direction { Null = 0, Negative = -1, Positive = 1 };
@@ -48,4 +48,4 @@ private:
     bool  is_active_upper_ = false;
 };
 
-} // namespace liteaerosim::control
+} // namespace liteaero::control
