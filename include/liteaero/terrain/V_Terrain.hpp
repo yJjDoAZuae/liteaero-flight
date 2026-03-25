@@ -1,6 +1,6 @@
 #pragma once
 
-namespace liteaerosim::environment {
+namespace liteaero::terrain {
 
 class V_Terrain {
 public:
@@ -25,4 +25,4 @@ private:
     float elevation_m_;
 };
 
-} // namespace liteaerosim::environment
+} // namespace liteaero::terrain

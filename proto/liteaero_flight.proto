@@ -59,3 +59,25 @@ message KinematicStateSnapshot {
     float            roll_rate_wind_rad_s  = 12;
     Vector3f         wind_ned_mps          = 13;
 }
+
+// ---------------------------------------------------------------------------
+// TerrainTileProto — binary serialization for liteaero::terrain::TerrainTile.
+// Defined in Step 8 of the migration plan.
+// ---------------------------------------------------------------------------
+
+message TerrainTileProto {
+    int32           schema_version      = 1;
+    int32           lod                 = 2;
+    double          centroid_lat_rad    = 3;
+    double          centroid_lon_rad    = 4;
+    float           centroid_height_m   = 5;
+    double          lat_min_rad         = 6;
+    double          lat_max_rad         = 7;
+    double          lon_min_rad         = 8;
+    double          lon_max_rad         = 9;
+    float           height_min_m        = 10;
+    float           height_max_m        = 11;
+    repeated float  vertices            = 12;  // packed: east_m, north_m, up_m per vertex
+    repeated uint32 indices             = 13;  // packed: 3 indices per facet
+    repeated uint32 colors              = 14;  // packed RGB (R<<16|G<<8|B) per facet
+}

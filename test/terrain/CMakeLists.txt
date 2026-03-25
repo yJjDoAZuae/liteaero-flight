@@ -1,12 +1,12 @@
 # ---------------------------------------------------------------------------
 # liteaero::terrain tests
-# Activated in Step 4 (terrain namespace migration).
+# Activated in Step 8 (terrain namespace migration).
 # ---------------------------------------------------------------------------
 
-# Terrain tests are not yet ready to build — TerrainTile and Terrain headers
-# have not been migrated to liteaero-flight. Add sources here in the terrain
-# migration step.
-set(LAF_TERRAIN_TEST_SOURCES)
+set(LAF_TERRAIN_TEST_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Terrain_test.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/TerrainTile_test.cpp
+)
 
 if(NOT LAF_TERRAIN_TEST_SOURCES)
     message(STATUS "liteaero_terrain_test: no test sources found — skipping")

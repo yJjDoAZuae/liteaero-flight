@@ -1,6 +1,6 @@
 #pragma once
 
-namespace liteaerosim::environment {
+namespace liteaero::terrain {
 
 // Primary query interface for simulation-loop terrain queries.
 // Specifies a rectangular footprint in the local North-East plane,
@@ -12,4 +12,4 @@ struct LocalAABB {
     float height_max_m;         // WGS84 ellipsoidal height upper bound (m)
 };
 
-} // namespace liteaerosim::environment
+} // namespace liteaero::terrain

@@ -70,13 +70,24 @@ target_link_libraries(liteaero_control
 )
 
 # --- liteaero::terrain ---
-add_library(liteaero_terrain INTERFACE)
-add_library(liteaero::terrain ALIAS liteaero_terrain)
-target_include_directories(liteaero_terrain INTERFACE
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+add_library(liteaero_terrain STATIC
+    terrain/Terrain.cpp
+    terrain/TerrainTile.cpp
 )
-target_compile_features(liteaero_terrain INTERFACE cxx_std_17)
+add_library(liteaero::terrain ALIAS liteaero_terrain)
+target_include_directories(liteaero_terrain
+    PUBLIC
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
+target_compile_features(liteaero_terrain PUBLIC cxx_std_17)
+target_link_libraries(liteaero_terrain
+    PUBLIC
+        nlohmann_json::nlohmann_json
+    PRIVATE
+        liteaero_flight_proto
+        protobuf::libprotobuf
+)
 
 # --- liteaero::nav ---
 add_library(liteaero_nav STATIC

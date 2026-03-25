@@ -1,6 +1,6 @@
 #pragma once
 
-namespace liteaerosim::environment {
+namespace liteaero::terrain {
 
 struct GeodeticAABB {
     double lat_min_rad;
@@ -11,4 +11,4 @@ struct GeodeticAABB {
     float  height_max_m;
 };
 
-} // namespace liteaerosim::environment
+} // namespace liteaero::terrain

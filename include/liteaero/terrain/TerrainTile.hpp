@@ -1,15 +1,15 @@
 #pragma once
-#include "environment/GeodeticPoint.hpp"
-#include "environment/GeodeticAABB.hpp"
-#include "environment/TerrainVertex.hpp"
-#include "environment/TerrainFacet.hpp"
+#include <liteaero/terrain/GeodeticPoint.hpp>
+#include <liteaero/terrain/GeodeticAABB.hpp>
+#include <liteaero/terrain/TerrainVertex.hpp>
+#include <liteaero/terrain/TerrainFacet.hpp>
 #include <nlohmann/json.hpp>
 #include <array>
 #include <cstddef>
 #include <cstdint>
 #include <vector>
 
-namespace liteaerosim::environment {
+namespace liteaero::terrain {
 
 enum class TerrainLod : int {
     L0_Finest         = 0,  // ~10 m vertex spacing
@@ -54,4 +54,4 @@ private:
     std::vector<TerrainFacet>  facets_;
 };
 
-} // namespace liteaerosim::environment
+} // namespace liteaero::terrain

@@ -1,11 +1,10 @@
 #define _USE_MATH_DEFINES
-#include "environment/TerrainTile.hpp"
-#include "environment/TerrainCell.hpp"
+#include <liteaero/terrain/TerrainTile.hpp>
 #include <gtest/gtest.h>
 #include <cmath>
 #include <stdexcept>
 
-using namespace liteaerosim::environment;
+using namespace liteaero::terrain;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -158,36 +157,62 @@ TEST(TerrainTileTest, JsonSchemaVersionMismatch_Throws) {
 }
 
 // ---------------------------------------------------------------------------
-// T6: TerrainCell addTile + hasLod + tile() round-trip
+// T6: Proto round-trip preserves vertices, facets, centroid, and LOD
 // ---------------------------------------------------------------------------
-TEST(TerrainTileTest, TerrainCell_AddTileAndHasLod) {
-    TerrainCell cell;
-    cell.addTile(makeMinimalTile(TerrainLod::L2_HighDetail));
+TEST(TerrainTileTest, ProtoRoundTrip_VerticesAndIndicesPreserved) {
+    GeodeticPoint centroid{0.6, 0.8, 150.f};
+    GeodeticAABB  bounds{0.59, 0.61, 0.79, 0.81, 140.f, 160.f};
+    std::vector<TerrainVertex> vertices{
+        { 5.0f, -3.0f, 10.0f},
+        {-2.0f,  7.0f,  0.0f},
+        {12.0f,  4.0f,  5.0f},
+    };
+    std::vector<TerrainFacet> facets{{{2, 0, 1}, {100, 150, 200}}};
+    TerrainTile original(TerrainLod::L4_LowDetail, centroid, bounds,
+                         std::move(vertices), std::move(facets));
 
-    EXPECT_TRUE(cell.hasLod(TerrainLod::L2_HighDetail));
-    EXPECT_FALSE(cell.hasLod(TerrainLod::L0_Finest));
+    const std::vector<uint8_t> bytes = original.serializeProto();
+    const TerrainTile restored = TerrainTile::deserializeProto(bytes);
 
-    const TerrainTile& t = cell.tile(TerrainLod::L2_HighDetail);
-    EXPECT_EQ(t.lod(), TerrainLod::L2_HighDetail);
+    EXPECT_EQ(restored.lod(), TerrainLod::L4_LowDetail);
+    ASSERT_EQ(restored.vertices().size(), 3u);
+    EXPECT_NEAR(restored.vertices()[0].east_m,   5.0f, 1e-4f);
+    EXPECT_NEAR(restored.vertices()[0].north_m, -3.0f, 1e-4f);
+    EXPECT_NEAR(restored.vertices()[0].up_m,    10.0f, 1e-4f);
+    EXPECT_NEAR(restored.vertices()[1].east_m,  -2.0f, 1e-4f);
+    ASSERT_EQ(restored.facets().size(), 1u);
+    EXPECT_EQ(restored.facets()[0].v[0], 2u);
+    EXPECT_EQ(restored.facets()[0].v[1], 0u);
+    EXPECT_EQ(restored.facets()[0].v[2], 1u);
+    EXPECT_EQ(restored.facets()[0].color.r, 100);
+    EXPECT_EQ(restored.facets()[0].color.g, 150);
+    EXPECT_EQ(restored.facets()[0].color.b, 200);
+    EXPECT_DOUBLE_EQ(restored.centroid().latitude_rad,  0.6);
+    EXPECT_DOUBLE_EQ(restored.centroid().longitude_rad, 0.8);
+    EXPECT_FLOAT_EQ(restored.centroid().height_wgs84_m, 150.f);
 }
 
 // ---------------------------------------------------------------------------
-// T7: TerrainCell::tile() throws std::out_of_range for a missing LOD
+// T7: Proto schema version mismatch throws std::runtime_error
 // ---------------------------------------------------------------------------
-TEST(TerrainTileTest, TerrainCell_MissingLod_Throws) {
-    TerrainCell cell;
-    cell.addTile(makeMinimalTile(TerrainLod::L1_VeryHighDetail));
-    EXPECT_THROW({ (void)cell.tile(TerrainLod::L3_MediumDetail); }, std::out_of_range);
-}
-
-// ---------------------------------------------------------------------------
-// T8: finestAvailableLod / coarsestAvailableLod with only L1 and L3 populated
-// ---------------------------------------------------------------------------
-TEST(TerrainTileTest, TerrainCell_FinestCoarsestLod) {
-    TerrainCell cell;
-    cell.addTile(makeMinimalTile(TerrainLod::L1_VeryHighDetail));
-    cell.addTile(makeMinimalTile(TerrainLod::L3_MediumDetail));
-
-    EXPECT_EQ(cell.finestAvailableLod(),   TerrainLod::L1_VeryHighDetail);
-    EXPECT_EQ(cell.coarsestAvailableLod(), TerrainLod::L3_MediumDetail);
+TEST(TerrainTileTest, ProtoSchemaVersionMismatch_Throws) {
+    // Serialize a valid tile, then corrupt the bytes by re-serializing with
+    // schema_version = 99 via JSON → proto path is not available, so we test
+    // by directly passing a tile that produces version=1 and verify the happy
+    // path round-trips; the mismatch path is tested via a hand-crafted proto.
+    // Build a minimal proto with schema_version=99 manually.
+    const TerrainTile tile = makeMinimalTile(TerrainLod::L0_Finest);
+    const std::vector<uint8_t> good_bytes = tile.serializeProto();
+    // Corrupt: replace schema_version field.  Proto field 1 (int32) is varint
+    // tag 0x08 followed by the value.  The first two bytes of a well-formed
+    // TerrainTileProto with schema_version=1 are 0x08 0x01.  Replace with 99.
+    std::vector<uint8_t> bad_bytes = good_bytes;
+    // Find and patch the schema_version varint (tag=0x08, value=0x01 → 0x63).
+    for (std::size_t i = 0; i + 1 < bad_bytes.size(); ++i) {
+        if (bad_bytes[i] == 0x08 && bad_bytes[i + 1] == 0x01) {
+            bad_bytes[i + 1] = 0x63;  // 99 decimal
+            break;
+        }
+    }
+    EXPECT_THROW({ (void)TerrainTile::deserializeProto(bad_bytes); }, std::runtime_error);
 }

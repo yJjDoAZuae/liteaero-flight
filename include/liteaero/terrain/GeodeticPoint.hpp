@@ -1,6 +1,6 @@
 #pragma once
 
-namespace liteaerosim::environment {
+namespace liteaero::terrain {
 
 struct GeodeticPoint {
     double latitude_rad;    // WGS84 geodetic latitude (rad)
@@ -8,4 +8,4 @@ struct GeodeticPoint {
     float  height_wgs84_m;  // WGS84 ellipsoidal height (m)
 };
 
-} // namespace liteaerosim::environment
+} // namespace liteaero::terrain

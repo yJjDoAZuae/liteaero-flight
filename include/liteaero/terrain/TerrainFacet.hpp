@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-namespace liteaerosim::environment {
+namespace liteaero::terrain {
 
 struct FacetColor {
     uint8_t r = 0;
@@ -14,4 +14,4 @@ struct TerrainFacet {
     FacetColor color;  // packed R8G8B8 representative color
 };
 
-} // namespace liteaerosim::environment
+} // namespace liteaero::terrain

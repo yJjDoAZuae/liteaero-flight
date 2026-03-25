@@ -1,6 +1,6 @@
 #pragma once
 
-namespace liteaerosim::environment {
+namespace liteaero::terrain {
 
 struct TerrainVertex {
     float east_m;   // east displacement from tile centroid in local ENU frame (m)
@@ -8,4 +8,4 @@ struct TerrainVertex {
     float up_m;     // vertical displacement from tile centroid, positive up (m)
 };
 
-} // namespace liteaerosim::environment
+} // namespace liteaero::terrain
