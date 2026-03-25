@@ -1,10 +1,10 @@
 #define _USE_MATH_DEFINES
-#include "control/Limit.hpp"
+#include <liteaero/control/Limit.hpp>
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 
-using namespace liteaerosim::control;
+using namespace liteaero::control;
 
 TEST(LimitTest, Instantiation00) {
 

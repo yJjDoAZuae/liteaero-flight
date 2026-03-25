@@ -1,10 +1,10 @@
 #pragma once
 
-#include "SisoElement.hpp"
-#include "control/control.hpp"
-#include <Eigen/Dense>
+#include <liteaero/control/SisoElement.hpp>
+#include <liteaero/control/control.hpp>
+#include <liteaero/control/numerics.hpp>
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
 /// Abstract base for all discrete filter implementations.
 ///
@@ -12,9 +12,9 @@ namespace liteaerosim::control {
 /// All concrete filters (FilterSS2, FilterSS2Clip, FilterTF, FilterTF2,
 /// FilterFIR, FilterSS) derive from this class and implement the full
 /// SisoElement NVI lifecycle.
-class Filter : public liteaerosim::SisoElement {
+class Filter : public SisoElement {
 public:
-    constexpr static char maxNumStates = liteaerosim::kFilterMaxStates;
+    constexpr static char maxNumStates = kFilterMaxStates;
 
     /// Number of filter poles.
     virtual uint8_t order() const = 0;
@@ -30,8 +30,8 @@ public:
     virtual void resetToOutput(float out_val) = 0;
 
     /// Bitmask of active error flags (0 = no error).
-    /// See liteaerosim::control::FilterError for bit definitions.
+    /// See liteaero::control::FilterError for bit definitions.
     virtual uint16_t errorCode() const = 0;
 };
 
-} // namespace liteaerosim::control
+} // namespace liteaero::control

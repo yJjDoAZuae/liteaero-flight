@@ -3,10 +3,9 @@
 # Activated in Step 5 (nav namespace migration).
 # ---------------------------------------------------------------------------
 
-file(GLOB LAF_NAV_TEST_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/*_test.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/*_test.cc"
-)
+# Nav tests are not yet ready to build — WGS84 and nav headers have not been
+# migrated to liteaero-flight. Add sources here in the nav migration step.
+set(LAF_NAV_TEST_SOURCES)
 
 if(NOT LAF_NAV_TEST_SOURCES)
     message(STATUS "liteaero_nav_test: no test sources found — skipping")
@@ -16,7 +15,7 @@ endif()
 add_executable(liteaero_nav_test ${LAF_NAV_TEST_SOURCES})
 
 target_include_directories(liteaero_nav_test PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
 
 target_compile_features(liteaero_nav_test PRIVATE cxx_std_17)

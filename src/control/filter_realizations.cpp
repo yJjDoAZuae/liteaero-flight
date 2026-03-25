@@ -1,12 +1,12 @@
 #define _USE_MATH_DEFINES
 
-#include "control/control.hpp"
-#include "control/filter_realizations.hpp"
+#include <liteaero/control/control.hpp>
+#include <liteaero/control/filter_realizations.hpp>
 #include <cmath>
 
-using namespace liteaerosim::control;
+using namespace liteaero::control;
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
 // https://en.wikipedia.org/wiki/Butterworth_filter#Normalized_Butterworth_polynomials
 FilterError butter(uint8_t order, float wn_rps, FiltVectorXf& num_s, FiltVectorXf& den_s)
@@ -581,4 +581,4 @@ FilterError zpk2tf2(Vec2c zeros, Vec2c poles, float K, uint8_t nz, uint8_t np, V
     return FilterError::None;
 }
 
-}
+} // namespace liteaero::control

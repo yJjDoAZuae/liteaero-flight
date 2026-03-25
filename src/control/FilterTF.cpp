@@ -1,11 +1,10 @@
 #include <cmath>
 
-#include "control/control.hpp"
-#include "control/filter_realizations.hpp"
-#include "control/FilterTF.hpp"
+#include <liteaero/control/control.hpp>
+#include <liteaero/control/filter_realizations.hpp>
+#include <liteaero/control/FilterTF.hpp>
 
-using namespace liteaerosim::control;
-using namespace liteaerosim;
+using namespace liteaero::control;
 
 FilterTF::FilterTF() {
     num_.resize(1);

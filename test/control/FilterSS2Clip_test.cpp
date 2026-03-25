@@ -1,6 +1,6 @@
 #define _USE_MATH_DEFINES
-#include "control/FilterSS2Clip.hpp"
-#include "control/filter_realizations.hpp"
+#include <liteaero/control/FilterSS2Clip.hpp>
+#include <liteaero/control/filter_realizations.hpp>
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 #include <iostream>
@@ -8,8 +8,7 @@
 #include <iomanip>
 
 using namespace std;
-using namespace liteaerosim::control;
-using namespace liteaerosim;
+using namespace liteaero::control;
 
 TEST(FilterSS2ClipTest, Instantiation00) {
 

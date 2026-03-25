@@ -1,12 +1,10 @@
 
 #pragma once
 
-#include "control/control.hpp"
-#include "control/Filter.hpp"
-#include <Eigen/Dense>
+#include <liteaero/control/Filter.hpp>
 #include <nlohmann/json.hpp>
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
 class FilterSS : public Filter {
 
@@ -57,4 +55,4 @@ private:
     uint16_t error_code_ = 0;
 };
 
-}  // namespace liteaerosim::control
+} // namespace liteaero::control

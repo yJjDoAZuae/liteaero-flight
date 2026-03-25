@@ -1,14 +1,12 @@
 #pragma once
 
-#include "control/Filter.hpp"
-#include "control/control.hpp"
-#include <Eigen/Dense>
+#include <liteaero/control/Filter.hpp>
 #include <unsupported/Eigen/MatrixFunctions>
 #include <nlohmann/json.hpp>
 #include <cstdint>
 #include <string>
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
 /// Second-order (or first-order) state-space IIR filter.
 ///
@@ -61,7 +59,7 @@ protected:
     float          onStep(float u)                                   override;
     nlohmann::json onSerializeJson()                           const override;
     void           onDeserializeJson(const nlohmann::json& state)    override;
-    void           onLog(liteaerosim::ILogger& logger)         const override;
+    void           onLog(liteaero::log::ILogger& logger)         const override;
     int            schemaVersion()                             const override { return 1; }
     const char*    typeName()                                  const override { return "FilterSS2"; }
 
@@ -91,4 +89,4 @@ private:
     nlohmann::json params_;  ///< Stored config JSON for serialization round-trip.
 };
 
-}  // namespace liteaerosim::control
+} // namespace liteaero::control

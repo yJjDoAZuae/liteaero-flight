@@ -1,8 +1,8 @@
 #pragma once
 
-#include "numerics.hpp"
+#include <cstdint>
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
 enum class FilterError : uint16_t {
     None             = 0,
@@ -22,4 +22,4 @@ enum class DiscretizationMethod {
     PoleZeroMatch = 4,
 };
 
-}  // namespace liteaerosim::control
+}  // namespace liteaero::control

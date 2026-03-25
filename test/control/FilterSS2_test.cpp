@@ -1,12 +1,11 @@
 #define _USE_MATH_DEFINES
-#include "control/FilterSS2.hpp"
-#include "control/filter_realizations.hpp"
+#include <liteaero/control/FilterSS2.hpp>
+#include <liteaero/control/filter_realizations.hpp>
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 
-using namespace liteaerosim::control;
-using namespace liteaerosim;
+using namespace liteaero::control;
 
 // ---------------------------------------------------------------------------
 // Default-constructed state

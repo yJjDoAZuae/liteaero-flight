@@ -3,13 +3,13 @@
 #include <stdexcept>
 #include <string>
 
-#include "control/control.hpp"
-#include "control/filter_realizations.hpp"
-#include "control/FilterSS2.hpp"
+#include <liteaero/control/control.hpp>
+#include <liteaero/control/filter_realizations.hpp>
+#include <liteaero/control/FilterSS2.hpp>
 
-using namespace liteaerosim::control;
+using namespace liteaero::control;
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
 static constexpr float kDcTol               = 1e-6f;
 static constexpr float kInvertibleThreshold = 1e-4f;
@@ -109,7 +109,7 @@ void FilterSS2::onDeserializeJson(const nlohmann::json& state) {
     x_(1) = s.at("x1").get<float>();
 }
 
-void FilterSS2::onLog(liteaerosim::ILogger& logger) const {
+void FilterSS2::onLog(liteaero::log::ILogger& logger) const {
     logger.log("FilterSS2.in",  in_);
     logger.log("FilterSS2.out", out_);
     logger.log("FilterSS2.x0",  x_(0));
@@ -273,4 +273,4 @@ void FilterSS2::designNotchSecond(float dt_s, float wn_rad_s, float zeta_den, fl
     order_ = 2;
 }
 
-}  // namespace liteaerosim::control
+} // namespace liteaero::control

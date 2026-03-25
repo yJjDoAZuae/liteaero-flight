@@ -1,12 +1,11 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-#include "control/control.hpp"
-#include "control/filter_realizations.hpp"
-#include "control/FilterSS.hpp"
+#include <liteaero/control/control.hpp>
+#include <liteaero/control/filter_realizations.hpp>
+#include <liteaero/control/FilterSS.hpp>
 
-using namespace liteaerosim::control;
-using namespace liteaerosim;
+using namespace liteaero::control;
 
 FilterSS::FilterSS() {
     phi_.resize(0, 0);

@@ -1,11 +1,10 @@
 #define _USE_MATH_DEFINES
-#include "control/FilterSS.hpp"
-#include "control/filter_realizations.hpp"
+#include <liteaero/control/FilterSS.hpp>
+#include <liteaero/control/filter_realizations.hpp>
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 
-using namespace liteaerosim::control;
-using namespace liteaerosim;
+using namespace liteaero::control;
 
 TEST(FilterSSTest, Instantiation00) {
 

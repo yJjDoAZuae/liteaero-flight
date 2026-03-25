@@ -36,6 +36,15 @@ target_link_libraries(liteaero_log
 add_library(liteaero_control STATIC
     control/DynamicElement.cpp
     control/SisoElement.cpp
+    control/numerics.cpp
+    control/filter_realizations.cpp
+    control/FilterSS2.cpp
+    control/FilterSS2Clip.cpp
+    control/FilterTF.cpp
+    control/FilterTF2.cpp
+    control/FilterFIR.cpp
+    control/FilterSS.cpp
+    control/Limit.cpp
 )
 add_library(liteaero::control ALIAS liteaero_control)
 target_include_directories(liteaero_control
@@ -48,6 +57,7 @@ target_link_libraries(liteaero_control
     PUBLIC
         liteaero::log
         nlohmann_json::nlohmann_json
+        Eigen3::Eigen
     PRIVATE
         liteaero_flight_proto
         protobuf::libprotobuf

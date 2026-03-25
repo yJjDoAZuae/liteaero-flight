@@ -1,9 +1,8 @@
-#include "control/FilterFIR.hpp"
+#include <liteaero/control/FilterFIR.hpp>
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 
-using namespace liteaerosim::control;
-using namespace liteaerosim;
+using namespace liteaero::control;
 
 TEST(FilterFIRTest, Instantiation00) {
     FilterFIR G;

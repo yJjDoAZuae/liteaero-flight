@@ -2,12 +2,11 @@
 
 #include <cmath>
 
-#include "control/control.hpp"
-#include "control/filter_realizations.hpp"
-#include "control/FilterTF2.hpp"
+#include <liteaero/control/control.hpp>
+#include <liteaero/control/filter_realizations.hpp>
+#include <liteaero/control/FilterTF2.hpp>
 
-using namespace liteaerosim::control;
-using namespace liteaerosim;
+using namespace liteaero::control;
 
 FilterTF2::FilterTF2() {
     num_ << 1, 0, 0;

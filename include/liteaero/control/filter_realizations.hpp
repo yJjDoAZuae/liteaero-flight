@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Eigen/Dense>
-#include "control/control.hpp"
+#include <liteaero/control/control.hpp>
+#include <liteaero/control/numerics.hpp>
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
 FilterError butter(uint8_t order, 
                    float wn_rps, 
@@ -105,4 +105,4 @@ FilterError zpk2tf2(Vec2c zeros,
                     Vec3 &num, 
                     Vec3 &den);
 
-}
+} // namespace liteaero::control

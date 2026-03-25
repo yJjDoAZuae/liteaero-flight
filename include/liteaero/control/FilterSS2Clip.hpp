@@ -1,11 +1,11 @@
 
 #pragma once
 
-#include "control/Filter.hpp"
-#include "control/Limit.hpp"
+#include <liteaero/control/Filter.hpp>
+#include <liteaero/control/Limit.hpp>
 #include <nlohmann/json.hpp>
 
-namespace liteaerosim::control {
+namespace liteaero::control {
 
 class FilterSS2Clip : public Filter {
 
@@ -78,4 +78,4 @@ private:
     uint16_t error_code_ = 0;
 };
 
-}  // namespace liteaerosim::control
+} // namespace liteaero::control

@@ -1,9 +1,8 @@
 #define _USE_MATH_DEFINES
-#include "control/filter_realizations.hpp"
+#include <liteaero/control/filter_realizations.hpp>
 #include <gtest/gtest.h>
 
-using namespace liteaerosim::control;
-using namespace liteaerosim;
+using namespace liteaero::control;
 
 TEST(FilterRealizationsTest, Tustin2TF200) {
 

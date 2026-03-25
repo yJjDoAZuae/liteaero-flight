@@ -3,9 +3,18 @@
 # Activated in Step 2 (control namespace migration).
 # ---------------------------------------------------------------------------
 
-file(GLOB LAF_CONTROL_TEST_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/*_test.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/*_test.cc"
+# Step 4 tests only — Step 5 tests (Integrator, Derivative, RateLimit, Unwrap,
+# Antiwindup, Gain, SISOPIDFF, RectilinearTable, TableAxis) are in this directory
+# but are not listed here until their headers are migrated in Step 5.
+set(LAF_CONTROL_TEST_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/FilterFIR_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/FilterRealizations_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/FilterSS2_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/FilterSS2Clip_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/FilterSS_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/FilterTF_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/FilterTF2_test.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Limit_test.cpp"
 )
 
 if(NOT LAF_CONTROL_TEST_SOURCES)
@@ -16,7 +25,7 @@ endif()
 add_executable(liteaero_control_test ${LAF_CONTROL_TEST_SOURCES})
 
 target_include_directories(liteaero_control_test PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
 
 target_compile_features(liteaero_control_test PRIVATE cxx_std_17)

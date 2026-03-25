@@ -3,10 +3,10 @@
 # Activated in Step 4 (terrain namespace migration).
 # ---------------------------------------------------------------------------
 
-file(GLOB LAF_TERRAIN_TEST_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/*_test.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/*_test.cc"
-)
+# Terrain tests are not yet ready to build — TerrainTile and Terrain headers
+# have not been migrated to liteaero-flight. Add sources here in the terrain
+# migration step.
+set(LAF_TERRAIN_TEST_SOURCES)
 
 if(NOT LAF_TERRAIN_TEST_SOURCES)
     message(STATUS "liteaero_terrain_test: no test sources found — skipping")
@@ -16,7 +16,7 @@ endif()
 add_executable(liteaero_terrain_test ${LAF_TERRAIN_TEST_SOURCES})
 
 target_include_directories(liteaero_terrain_test PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
 
 target_compile_features(liteaero_terrain_test PRIVATE cxx_std_17)

@@ -2,15 +2,14 @@
 #include <cmath>
 #include <stdexcept>
 
-#include "control/control.hpp"
-#include "control/filter_realizations.hpp"
-#include "control/FilterSS2Clip.hpp"
+#include <liteaero/control/control.hpp>
+#include <liteaero/control/filter_realizations.hpp>
+#include <liteaero/control/FilterSS2Clip.hpp>
 #include <unsupported/Eigen/MatrixFunctions>  // for Matrix::pow() in controlGrammian/observeGrammian
 
 static constexpr float kDcTol = 1e-6f;
 
-using namespace liteaerosim::control;
-using namespace liteaerosim;
+using namespace liteaero::control;
 
 FilterSS2Clip::FilterSS2Clip() {
     phi_.setZero();
