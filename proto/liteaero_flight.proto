@@ -1,0 +1,9 @@
+// liteaero_flight.proto
+//
+// Binary serialization schema for LiteAero Flight components.
+// Message definitions are added per subsystem in Steps 2–8 of the migration plan.
+// Generated C++ is consumed only from .cpp files — never include .pb.h in public headers.
+
+syntax = "proto3";
+
+package liteaeroflight;

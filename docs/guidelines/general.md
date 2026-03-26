@@ -1,0 +1,325 @@
+# General Coding and Development Guidelines
+
+## Development Philosophy
+
+### Project Lifecycle Phase
+
+LiteAero Flight is in **initial development**. Every interface, data structure, and serialized
+format is subject to change without notice. This phase ends when the project transitions
+to a maintenance workflow with published APIs and persistent serialized data.
+
+Consequences for the current phase:
+
+| Rule | Rationale |
+| ---- | --------- |
+| **Never increment `schema_version`** — all serialized objects use `schema_version = 1`. | There are no deployed serialized files that need migration. Incrementing would add complexity with no benefit. |
+| **Never add backward-compatibility shims** — when an API changes, update every call site directly and delete the old form completely. | No external consumers exist. Compatibility layers are dead weight. |
+| **Never reference a previous design in documentation or comments** — describe only the current state. | History lives in version control. Stale design notes mislead future readers. |
+
+Architecture note: the `schema_version` field and the versioned serialization infrastructure
+are retained in every serialized class. When the project eventually transitions to a
+maintenance phase, `schema_version` will be incremented on breaking changes and a migration
+path will be required. The machinery is already in place; only the policy changes.
+
+---
+
+### Test-Driven Development (TDD)
+
+All new functionality must follow the **Red-Green-Refactor** cycle:
+
+1. **Red** — Write a failing test that defines the desired behavior.
+2. **Green** — Write the minimal code required to pass the test.
+3. **Refactor** — Clean up the implementation without changing behavior, keeping all tests green.
+
+Rules:
+
+- No production code is written without a failing test that motivates it.
+- Each test covers exactly one behavior or requirement.
+- Tests are committed alongside (or before) the code they cover.
+- Tests must be fast, isolated, repeatable, and self-validating.
+- Aim for a test pyramid: many unit tests, fewer integration tests, few end-to-end tests.
+
+### SOLID Principles
+
+| Principle | Summary |
+| --- | --- |
+| Single Responsibility | A class or module has one reason to change. |
+| Open/Closed | Open for extension, closed for modification. |
+| Liskov Substitution | Subtypes must be substitutable for their base types. |
+| Interface Segregation | Prefer narrow, focused interfaces over wide ones. |
+| Dependency Inversion | Depend on abstractions, not concretions. |
+
+---
+
+## Naming Standards
+
+Clear, unambiguous naming is mandatory. Names must communicate intent without requiring a comment.
+
+### General Rules
+
+- Names must be descriptive and self-documenting.
+- Abbreviations are forbidden. The only permitted abbreviations are those that are standard
+  technical terms in aerospace / control engineering where the abbreviated form is the
+  canonical name: `pid` (proportional-integral-derivative controller), `imu` (inertial
+  measurement unit), `gnss` (global navigation satellite system), `ias`/`cas`/`eas`/`tas`
+  (airspeed types), `ned` (north-east-down frame), `enu` (east-north-up frame), `agl`
+  (above ground level), `msl` (mean sea level). All other abbreviations are forbidden,
+  including single-letter identifiers (`K`, `I`, `D`), common informal shorthand
+  (`cmd`, `meas`, `err`, `ffwd`), and mathematical symbol names (`Kp`, `Ki`, `Kd`).
+- Boolean names must read as a predicate: `is_converged`, `has_waypoint`, `can_engage`.
+- Names must not encode type information (no Hungarian notation): prefer `altitude` over `dAltitude`.
+- Acronyms are treated as words in `PascalCase` identifiers: `ImuSensor`, not `IMUSensor`;
+  `NedFrame`, not `NEDFrame`. Exception: established all-caps class names that are
+  themselves acronyms (`SISOPIDFF`) are kept as-is for readability.
+
+### Naming by Category
+
+| Category | Convention | Example |
+| --- | --- | --- |
+| Classes / Types | `PascalCase` | `KinematicStateSnapshot`, `AutopilotMode` |
+| Functions / Methods | `camelCase` (C++) or `snake_case` (Python) | `computeLoadFactor()` / `compute_load_factor()` |
+| Local variables | `snake_case` | `roll_rate`, `target_altitude` |
+| Member variables | `snake_case` with trailing `_` (C++) | `roll_rate_`, `mass_kg_` |
+| Constants | `SCREAMING_SNAKE_CASE` | `MAX_BANK_ANGLE_RAD`, `GRAVITY_MPS2` |
+| Namespaces / Packages | `snake_case`, lowercase | `liteaero::control`, `liteaero::guidance` |
+| Files | `PascalCase` for classes, `snake_case` for others | `DynamicElement.cpp`, `unit_conversion.cpp` |
+| Test files | Mirror the file under test with `_test` suffix | `DynamicElement_test.cpp`, `test_dynamic_element.py` |
+
+---
+
+## SI Units — The Project Standard
+
+**All internally stored values use SI base units: meters (m), radians (rad), and seconds (s).**
+
+This applies to every variable, field, parameter, function argument, and return value throughout the codebase.
+
+| Quantity | Unit | Symbol |
+| --- | --- | --- |
+| Length / distance | meter | m |
+| Angle | radian | rad |
+| Time | second | s |
+| Mass | kilogram | kg |
+| Speed | meter per second | m/s |
+| Acceleration | meter per second squared | m/s² |
+| Angular rate | radian per second | rad/s |
+| Force | newton | N |
+| Pressure | pascal | Pa |
+| Temperature | kelvin | K |
+| Density | kilogram per cubic meter | kg/m³ |
+
+### Enforcement
+
+- Variable names **should** encode units when not obvious from context: `altitude_m`, `bank_angle_rad`, `thrust_n`.
+- Unit conversion functions must live in a dedicated `unit_conversion` module/header, never inline in computation code.
+- Conversions to other units (degrees, feet, knots, etc.) occur **only** at the outermost interface layer:
+  - Display / HUD rendering
+  - Human-edited configuration file parsing (YAML, JSON, etc.)
+  - External data bus outputs (e.g., flight data recorder export)
+- Internal computation functions must never accept or return non-SI values.
+
+### Conversion Module Pattern
+
+```text
+units::deg_to_rad(degrees)    // input boundary: config file parser
+units::rad_to_deg(radians)    // output boundary: display layer only
+units::ft_to_m(feet)
+units::kts_to_mps(knots)
+```
+
+---
+
+## Serialization and Deserialization
+
+Every dynamic element (any object with internal state that evolves over time) must implement serialization and deserialization of its full internal state as a standard interface.
+
+### Purpose
+
+- Enables save/restore of flight software state (pause, rewind, replay in simulation).
+- Enables logging and post-flight analysis.
+- Enables reproducible testing with fixed initial conditions.
+- Enables inter-process or inter-language data exchange.
+
+### Two Required Formats
+
+Every serializable class must support both formats:
+
+| Format | Library | Method names | Use case |
+| --- | --- | --- | --- |
+| JSON | nlohmann/json | `serializeJson()` / `deserializeJson(j)` | Human-readable state files, config, debugging, inter-language exchange |
+| Binary | Protocol Buffers v3 | `serializeProto()` → `std::vector<uint8_t>` / `deserializeProto(bytes)` | Efficient checkpointing, high-frequency logging, IPC |
+
+Proto message definitions live in `proto/liteaero_flight.proto`. Generated types must not appear in public headers — the `std::vector<uint8_t>` interface keeps the public API format-agnostic. Include generated headers (`liteaero_flight.pb.h`) only in `.cpp` files.
+
+### Rules
+
+- Serialized representations use SI units — never convert to other units in serialized output.
+- Every serializable class must implement the four methods above.
+- Serialization must be round-trip lossless (serialize then deserialize must yield identical state) for both formats.
+- A `schema_version` field (integer) is included in all serialized output. Deserialize throws `std::runtime_error` on version mismatch.
+- Serialization interfaces are covered by dedicated round-trip unit tests for both formats.
+- `DynamicElement` subclasses use the NVI pattern (`onSerialize`/`onDeserialize`) for the JSON format; the base class injects `schema_version` and `type`. See [docs/architecture/dynamic_element.md](../architecture/dynamic_element.md) for details.
+- Non-`DynamicElement` classes add the four methods as plain public member functions. Stateless classes use a static factory for deserialization: `static T deserializeJson(const nlohmann::json&)`.
+
+---
+
+## Architectural Design Patterns
+
+### Separation of Concerns
+
+The flight software is structured in layers. Each layer has a single well-defined responsibility:
+
+```text
+┌─────────────────────────────────────────┐
+│  Interface Layer (I/O, display, config)  │  ← Unit conversion lives here
+├─────────────────────────────────────────┤
+│  Application Layer (mission, session)    │
+├─────────────────────────────────────────┤
+│  Domain Layer (guidance, control, nav)   │  ← All SI, no I/O
+├─────────────────────────────────────────┤
+│  Infrastructure (math, serialization)    │
+└─────────────────────────────────────────┘
+```
+
+### Component Model
+
+- Flight software elements are **components** with a uniform lifecycle interface:
+  - `initialize(config)` — set up from configuration; `config` includes `dt_s` for elements that need it.
+  - `reset()` — return to initial conditions.
+  - `step(u)` — advance state by one timestep; timestep is fixed at `initialize()` time.
+  - `serialize()` / `deserialize(data)` — state snapshot.
+- Components are composed, not inherited, wherever possible.
+
+### Dependency Injection
+
+- Components receive their dependencies (sensors, models, data buses) via constructor or factory — never via global state or singletons.
+- This makes unit testing straightforward: inject mock dependencies.
+
+### Observer / Event Pattern
+
+- Use observer/callback patterns for decoupled communication between subsystems (e.g., mode changes, fault annunciation).
+- Avoid tight coupling between producers and consumers of events.
+
+---
+
+## External Dependencies and Licensing
+
+### License Policy
+
+**Default to permissive open-source libraries.** A permissive license places minimal restrictions on use, distribution, and linking, preserving maximum flexibility for the project.
+
+Acceptable licenses (preferred first):
+
+| License | Notes |
+| --- | --- |
+| MIT | Preferred. |
+| BSD-2/3-Clause, Clear BSD | Preferred. |
+| Apache 2.0 | Preferred. Includes explicit patent grant. |
+| Boost Software License 1.0 | Preferred. No binary attribution required. |
+| ISC | Preferred. Functionally equivalent to MIT. |
+| LGPL (any) | Acceptable only with dynamic linking. Never link statically against LGPL code. |
+| GPL (any) | Avoid. Copyleft propagates to the linked binary. |
+| Proprietary | Avoid unless no open-source alternative exists and explicit approval is obtained. |
+
+### Dependency Selection Criteria
+
+When evaluating a new dependency, consider in order:
+
+1. **License** — must be permissive (see above).
+2. **Maintenance** — active development or stable/complete.
+3. **Minimal footprint** — prefer focused, single-purpose libraries over large frameworks.
+4. **Source availability** — prefer source-distributed libraries over binary blobs.
+5. **CMake support** — prefer libraries that integrate cleanly with CMake.
+
+All dependencies must be documented with their version, license, and integration method. See the C++ and Python guidelines for language-specific dependency management.
+
+---
+
+## Code Review Standards
+
+- All code is reviewed before merging to `main`.
+- Tests must pass before review begins.
+- Review checklist:
+  - [ ] Tests present and meaningful
+  - [ ] Naming follows standards
+  - [ ] SI units used throughout internal code
+  - [ ] No unnecessary coupling
+  - [ ] Serialization implemented for new stateful components
+  - [ ] No hardcoded magic numbers (use named constants)
+  - [ ] New dependency license is permissive and recorded in the dependency registry
+  - [ ] No backward-compatibility shims, deprecated aliases, or forwarding wrappers (all call sites updated directly)
+
+---
+
+## Version Control
+
+- Commit messages use imperative mood: "Add roll rate filter" not "Added roll rate filter".
+- Each commit is self-contained and leaves the build passing.
+- Feature branches are short-lived; integrate frequently.
+- Do not commit commented-out code. Delete unused code; version control preserves history.
+
+---
+
+## Documentation and Math Formatting
+
+### LaTeX / KaTeX in Markdown
+
+All documentation math is rendered by KaTeX. KaTeX does not support arbitrary Unicode
+inside math mode — non-ASCII characters embedded raw in math expressions cause render
+errors.
+
+**Rule: never embed non-ASCII characters inside a math span (`` $…$ `` or `$$…$$``),
+including inside `\text{}` and `\mathrm{}` blocks.**
+
+Use the equivalent KaTeX command instead:
+
+| Instead of (raw Unicode) | Use (KaTeX command) |
+| --- | --- |
+| `\text{Pa·s}` | `\text{Pa}{\cdot}\text{s}` |
+| `\text{kg/m³}` | `\text{kg/m}^3` |
+| `\text{m/s²}` | `\text{m/s}^2` |
+| `\text{(Pa·s/m³)}` | `(\text{Pa}{\cdot}\text{s/m}^3)` |
+
+The pattern is: break `\text{}` around the special character and replace the character
+with its KaTeX counterpart (`{\cdot}`, `^2`, `^3`, subscripts, Greek letters, etc.).
+
+Non-ASCII characters are allowed in **plain prose** (outside math spans): writing
+"Pa·s" or "kg/m³" in a sentence or table cell is fine because it is rendered as HTML,
+not processed by KaTeX.
+
+### Markdown Lint Standards
+
+All documentation files must be free of markdownlint warnings before being committed or
+presented for review. Run the lint check below after creating or significantly editing any
+`.md` file.
+
+**Disabling rules is not permitted.** Fix the underlying formatting issue. The only
+rule disabled project-wide is MD013 (line length), because the 80-character default is
+unworkable for tables — it is suppressed in `.markdownlint.json`, not inline. Do not add
+further suppressions without explicit authorization.
+
+**Required checks:**
+
+| Rule | Description | Fix |
+| --- | --- | --- |
+| MD024 | No two headings may have identical text | Make headings unique; drop redundant subheadings if the parent section heading provides sufficient context |
+| MD031 | Fenced code blocks must be surrounded by blank lines | Add a blank line before the opening fence and after the closing fence |
+| MD032 | Lists must be preceded and followed by a blank line | Add a blank line before the first list item whenever the preceding line is non-blank prose or a bold label |
+| MD040 | Fenced code blocks must declare a language | Add a specifier: ` ```cpp `, ` ```python `, ` ```text `, ` ```proto `, ` ```mermaid `, etc. |
+| MD060 | Table separator rows must use spaced pipes | Use `\| --- \| --- \|` — never `\|---\|---\|` |
+| Mermaid syntax | Diagrams must use valid Mermaid edge syntax | Use `-- "label" -->` for labeled directed edges; avoid non-standard constructs such as `<-- "label" ---` |
+
+**Canonical lint tool (run from repo root):**
+
+```text
+PATH="/c/Program Files/nodejs:$PATH" npx markdownlint-cli2 "docs/**/*.md"
+```
+
+### Numerical Substitution in Derivations
+
+Substitute numerical values for physical constants (e.g. $\gamma = 1.4$, $R_d =
+287.058\,\text{J/(kg·K)}$) only in **worked examples** — never in derivation steps or
+general formulae. Premature substitution obscures the mathematical structure and makes
+the formula inapplicable to other gases or parameter regimes.
+
+- **Derivation:** keep symbols — $\left(1 + \frac{\gamma-1}{2}M^2\right)^{\gamma/(\gamma-1)}$
+- **Example:** substitute — $\left(1 + 0.2\,M^2\right)^{3.5}$ at $\gamma = 1.4$
