@@ -1,8 +1,8 @@
+#pragma once
 
-#include "control/ControlLoop.hpp"
-#include "KinematicState.hpp"
+#include <liteaero/autopilot/ControlLoop.hpp>
 
-namespace liteaerosim::control {
+namespace liteaero::autopilot {
 
 // input command is roll angle about velocity vector
 // output command is roll rate about velocity vector
@@ -10,10 +10,10 @@ namespace liteaerosim::control {
 class ControlRoll : public ControlLoop {
 
     void configure();
-    void configure(json config);
-    float step(float command, const KinematicState& state);
-    void reset(float command, const KinematicState& state);
+    void configure(nlohmann::json config);
+    float step(float command, const liteaero::nav::KinematicStateSnapshot& state);
+    void reset(float command, const liteaero::nav::KinematicStateSnapshot& state);
 
 };
 
-}
+} // namespace liteaero::autopilot

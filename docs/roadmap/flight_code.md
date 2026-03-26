@@ -26,6 +26,7 @@ resides in the `liteaero-flight` repository, consumed by LiteAero Sim via
 | Filter hierarchy, `Integrator`, `Derivative`, `RateLimit`, `Limit`, `SISOPIDFF` | `include/liteaero/control/`, `src/control/` | `liteaero::control` |
 | `WGS84`, `GeodeticPosition`, `KinematicStateSnapshot`, `KinematicStateUtil` | `include/liteaero/nav/`, `src/nav/` | `liteaero::nav` |
 | `TerrainVertex`, `TerrainFacet`, `GeodeticPoint`, `GeodeticAABB`, `LocalAABB`, `TerrainTile`, `V_Terrain`, `FlatTerrain` | `include/liteaero/terrain/`, `src/terrain/` | `liteaero::terrain` |
+| `ControlLoop`, `ControlAltitude`, `ControlHeading`, `ControlHeadingRate`, `ControlLoadFactor`, `ControlRoll`, `ControlVerticalSpeed` | `include/liteaero/autopilot/`, `src/autopilot/` | `liteaero::autopilot` |
 
 ### Stub headers (not yet implemented)
 
@@ -59,7 +60,7 @@ resides in the `liteaero-flight` repository, consumed by LiteAero Sim via
 | `liteaero::terrain` | `liteaero::terrain` | Terrain mesh types, `V_Terrain` | ✅ Complete |
 | `liteaero::nav` | `liteaero::nav` | `WGS84`, `KinematicStateSnapshot`, `KinematicStateUtil`; `NavigationFilter`, `WindEstimator`, `FlowAnglesEstimator` stubs | ✅ Partial — stubs only for estimation classes |
 | `liteaero::guidance` | `liteaero::guidance` | Path guidance, vertical guidance, park tracking | Stubs only |
-| `liteaero::autopilot` | `liteaero::autopilot` | Autopilot inner loop | Stub only |
+| `liteaero::autopilot` | `liteaero::autopilot` | `ControlLoop`, `Control*` subclasses (stubs); `Autopilot` stub | ✅ Partial — `ControlLoop` + 6 subclasses migrated; `Autopilot` stub only |
 | `liteaero::perception` | `liteaero::perception` | Vision navigator, lidar terrain estimator | Not started |
 | `liteaero::mission_autonomy` | `liteaero::mission_autonomy` | Link budget estimator | Not started |
 

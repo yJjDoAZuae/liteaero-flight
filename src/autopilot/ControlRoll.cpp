@@ -1,28 +1,28 @@
-#include "control/ControlRoll.hpp"
+#include <liteaero/autopilot/ControlRoll.hpp>
+#include <liteaero/nav/KinematicStateUtil.hpp>
+#include <Eigen/Dense>
 
-using namespace liteaerosim::control;
+namespace KSU = liteaero::nav::KinematicStateUtil;
 
-float ControlRoll::step(float command, const KinematicState& state)
+using namespace liteaero::autopilot;
+
+float ControlRoll::step(float command, const liteaero::nav::KinematicStateSnapshot& state)
 {
     controller_.setUnwrapInputs(true);
 
-    // get attitude Eulers of Wind frame
-    Eigen::Vector3f eulersWind = state.q_nw().toRotationMatrix().eulerAngles(3,2,1);
+    // ZYX Euler decomposition of Wind-to-NED rotation: [yaw, pitch, roll]
+    Eigen::Vector3f eulersWind = state.q_nw.toRotationMatrix().eulerAngles(2, 1, 0);
 
-    // get Body rates expressed in wind axes
-    Eigen::Vector3f ratesWind = state.q_nw().toRotationMatrix().transpose() * state.q_nb().toRotationMatrix() * state.rates_Body_rps();
-
-    // NOTE: roll and rollRate_rps aren't correct for velocity roll control
     // use roll Euler of Wind frame w.r.t. NED and the roll rate of the Wind frame
-    return controller_.step(command, eulersWind(0), state.rollRate_Wind_rps());
+    return controller_.step(command, eulersWind(2), state.roll_rate_wind_rad_s);
 }
 
-void ControlRoll::reset(float command, const KinematicState& state)
+void ControlRoll::reset(float command, const liteaero::nav::KinematicStateSnapshot& state)
 {
     controller_.setUnwrapInputs(true);
 
-    // get attitude Eulers of Wind frame
-    Eigen::Vector3f eulersWind = state.q_nw().toRotationMatrix().eulerAngles(3,2,1);
+    // ZYX Euler decomposition of Wind-to-NED rotation: [yaw, pitch, roll]
+    Eigen::Vector3f eulersWind = state.q_nw.toRotationMatrix().eulerAngles(2, 1, 0);
 
-    controller_.reset(command, eulersWind(0), 0.0f);
+    controller_.reset(command, eulersWind(2), 0.0f);
 }

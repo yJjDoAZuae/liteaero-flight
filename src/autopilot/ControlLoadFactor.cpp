@@ -1,17 +1,19 @@
-#include "control/ControlLoadFactor.hpp"
-#include <Eigen/Dense>
+#include <liteaero/autopilot/ControlLoadFactor.hpp>
+#include <liteaero/nav/KinematicStateUtil.hpp>
 
-using namespace liteaerosim::control;
+namespace KSU = liteaero::nav::KinematicStateUtil;
 
-static float constexpr g = 9.81;
+using namespace liteaero::autopilot;
 
-float ControlLoadFactor::step(float load_factor_command, const KinematicState& state)
+static float constexpr g = 9.81f;
+
+float ControlLoadFactor::step(float load_factor_command, const liteaero::nav::KinematicStateSnapshot& state)
 {
-    return controller_.step(load_factor_command, -state.acceleration_Wind_mps()(2) / g);
+    return controller_.step(load_factor_command, -KSU::acceleration_wind_mps2(state)(2) / g);
 }
 
-void ControlLoadFactor::reset(float load_factor_command, const KinematicState& state)
+void ControlLoadFactor::reset(float load_factor_command, const liteaero::nav::KinematicStateSnapshot& state)
 {
-    controller_.reset(load_factor_command, -state.acceleration_Wind_mps()(2) / g, 0.0f);
+    controller_.reset(load_factor_command, -KSU::acceleration_wind_mps2(state)(2) / g, 0.0f);
     controller_.integrator().resetTo(0.0f);
 }

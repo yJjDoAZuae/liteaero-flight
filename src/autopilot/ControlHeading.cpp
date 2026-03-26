@@ -1,15 +1,18 @@
-#include "control/ControlHeading.hpp"
+#include <liteaero/autopilot/ControlHeading.hpp>
+#include <liteaero/nav/KinematicStateUtil.hpp>
 
-using namespace liteaerosim::control;
+namespace KSU = liteaero::nav::KinematicStateUtil;
 
-float ControlHeading::step(float command, const KinematicState& state)
+using namespace liteaero::autopilot;
+
+float ControlHeading::step(float command, const liteaero::nav::KinematicStateSnapshot& state)
 {
     controller_.setUnwrapInputs(true);
-    return controller_.step(command, state.heading(), state.headingRate_rps());
+    return controller_.step(command, KSU::heading_rad(state), KSU::euler_rates_rad_s(state)(2));
 }
 
-void ControlHeading::reset(float command, const KinematicState& state)
+void ControlHeading::reset(float command, const liteaero::nav::KinematicStateSnapshot& state)
 {
     controller_.setUnwrapInputs(true);
-    controller_.reset(command, state.heading(), 0.0f);
+    controller_.reset(command, KSU::heading_rad(state), 0.0f);
 }

@@ -1,20 +1,19 @@
+#pragma once
 
-#include "control/SISOPIDFF.hpp"
-#include "KinematicState.hpp"
+#include <liteaero/control/SISOPIDFF.hpp>
+#include <liteaero/nav/KinematicStateSnapshot.hpp>
 #include <nlohmann/json.hpp>
 
-using json = nlohmann::json;
-
-namespace liteaerosim::control {
+namespace liteaero::autopilot {
 
 class ControlLoop {
 
 public:
 
     virtual void configure() = 0;
-    virtual void configure(json config) = 0;
-    virtual float step(float command, const KinematicState& state) = 0;
-    virtual void reset(float command, const KinematicState& state) = 0;
+    virtual void configure(nlohmann::json config) = 0;
+    virtual float step(float command, const liteaero::nav::KinematicStateSnapshot& state) = 0;
+    virtual void reset(float command, const liteaero::nav::KinematicStateSnapshot& state) = 0;
 
     float output()      const { return controller_.output(); }
     float command()     const { return controller_.command(); }
@@ -23,8 +22,8 @@ public:
     float feedForward() const { return controller_.feedForward(); }
 
 protected:
-    SISOPIDFF controller_;
+    liteaero::control::SISOPIDFF controller_;
 
 };
 
-}
+} // namespace liteaero::autopilot

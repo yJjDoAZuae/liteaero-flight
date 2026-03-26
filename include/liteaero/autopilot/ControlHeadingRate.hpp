@@ -1,16 +1,16 @@
+#pragma once
 
-#include "control/ControlLoop.hpp"
-#include "KinematicState.hpp"
+#include <liteaero/autopilot/ControlLoop.hpp>
 
-namespace liteaerosim::control {
+namespace liteaero::autopilot {
 
 class ControlHeadingRate : public ControlLoop {
 
     void configure();
-    void configure(json config);
-    float step(float heading_rate_command, const KinematicState& state);
-    void reset(float heading_rate_command, const KinematicState& state);
+    void configure(nlohmann::json config);
+    float step(float heading_rate_command, const liteaero::nav::KinematicStateSnapshot& state);
+    void reset(float heading_rate_command, const liteaero::nav::KinematicStateSnapshot& state);
 
 };
 
-}
+} // namespace liteaero::autopilot

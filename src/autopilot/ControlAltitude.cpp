@@ -1,15 +1,15 @@
-#include "control/ControlAltitude.hpp"
+#include <liteaero/autopilot/ControlAltitude.hpp>
 
-using namespace liteaerosim::control;
+using namespace liteaero::autopilot;
 
-float ControlAltitude::step(float command, const KinematicState& state)
+float ControlAltitude::step(float command, const liteaero::nav::KinematicStateSnapshot& state)
 {
     controller_.setUnwrapInputs(true);
-    return controller_.step(command, state.positionDatum().height_WGS84_m(), -state.velocity_NED_mps()(2));
+    return controller_.step(command, state.position.altitude_m, -state.velocity_ned_mps(2));
 }
 
-void ControlAltitude::reset(float command, const KinematicState& state)
+void ControlAltitude::reset(float command, const liteaero::nav::KinematicStateSnapshot& state)
 {
     controller_.setUnwrapInputs(true);
-    controller_.reset(command, state.positionDatum().height_WGS84_m(), 0.0f);
+    controller_.reset(command, state.position.altitude_m, 0.0f);
 }

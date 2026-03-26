@@ -4,10 +4,11 @@
 # One CMake target per C++ namespace.
 #
 # Target mapping:
-#   liteaero_log      / liteaero::log      — ILogger, logging sinks
-#   liteaero_control  / liteaero::control  — DynamicElement, SisoElement, Filter hierarchy
-#   liteaero_terrain  / liteaero::terrain  — terrain mesh types, V_Terrain
-#   liteaero_nav      / liteaero::nav      — WGS84, NavigationFilter, estimators
+#   liteaero_log        / liteaero::log        — ILogger, logging sinks
+#   liteaero_control    / liteaero::control    — DynamicElement, SisoElement, Filter hierarchy
+#   liteaero_terrain    / liteaero::terrain    — terrain mesh types, V_Terrain
+#   liteaero_nav        / liteaero::nav        — WGS84, NavigationFilter, estimators
+#   liteaero_autopilot  / liteaero::autopilot  — ControlLoop subclasses
 # ---------------------------------------------------------------------------
 
 # --- liteaero::log ---
@@ -83,6 +84,33 @@ target_include_directories(liteaero_terrain
 target_compile_features(liteaero_terrain PUBLIC cxx_std_17)
 target_link_libraries(liteaero_terrain
     PUBLIC
+        nlohmann_json::nlohmann_json
+    PRIVATE
+        liteaero_flight_proto
+        protobuf::libprotobuf
+)
+
+# --- liteaero::autopilot ---
+add_library(liteaero_autopilot STATIC
+    autopilot/ControlAltitude.cpp
+    autopilot/ControlHeading.cpp
+    autopilot/ControlHeadingRate.cpp
+    autopilot/ControlLoadFactor.cpp
+    autopilot/ControlRoll.cpp
+    autopilot/ControlVerticalSpeed.cpp
+)
+add_library(liteaero::autopilot ALIAS liteaero_autopilot)
+target_include_directories(liteaero_autopilot
+    PUBLIC
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
+target_compile_features(liteaero_autopilot PUBLIC cxx_std_17)
+target_link_libraries(liteaero_autopilot
+    PUBLIC
+        liteaero::control
+        liteaero::nav
+        Eigen3::Eigen
         nlohmann_json::nlohmann_json
     PRIVATE
         liteaero_flight_proto
