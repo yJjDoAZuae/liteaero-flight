@@ -6,7 +6,7 @@
 # Target mapping:
 #   liteaero_log        / liteaero::log        — ILogger, logging sinks
 #   liteaero_control    / liteaero::control    — DynamicElement, SisoElement, Filter hierarchy
-#   liteaero_terrain    / liteaero::terrain    — terrain mesh types, V_Terrain
+#   liteaero_terrain    / liteaero::terrain    — terrain mesh types, Terrain
 #   liteaero_nav        / liteaero::nav        — WGS84, NavigationFilter, estimators
 #   liteaero_autopilot  / liteaero::autopilot  — ControlLoop subclasses
 # ---------------------------------------------------------------------------

@@ -1,9 +1,9 @@
-#include <liteaero/terrain/V_Terrain.hpp>
+#include <liteaero/terrain/Terrain.hpp>
 #include <algorithm>
 
 namespace liteaero::terrain {
 
-float V_Terrain::heightAboveGround_m(float  altitude_m,
+float Terrain::heightAboveGround_m(float  altitude_m,
                                      double latitude_rad,
                                      double longitude_rad) const {
     return std::max(0.f, altitude_m - elevation_m(latitude_rad, longitude_rad));
