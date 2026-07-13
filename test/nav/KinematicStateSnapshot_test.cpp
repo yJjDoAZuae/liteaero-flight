@@ -2,6 +2,8 @@
 #include <liteaero/nav/KinematicStateUtil.hpp>
 #include <gtest/gtest.h>
 #include <cmath>
+#include <random>
+#include <string>
 
 using namespace liteaero::nav;
 namespace KSU = liteaero::nav::KinematicStateUtil;
@@ -98,6 +100,94 @@ TEST(KinematicStateSnapshotTest, PitchAngleCorrect) {
     Eigen::Quaternionf q_nw(Eigen::AngleAxisf(theta, Eigen::Vector3f::UnitY()));
     KinematicStateSnapshot s = makeSnapshot(q_nw, 0.0f, 0.0f);
     EXPECT_NEAR(KSU::pitch_rad(s), theta, 1e-4f);
+}
+
+TEST(KinematicStateSnapshotTest, EulerExtractionNegativeHeadingNoFlip) {
+    // Regression: a level, NEGATIVE-heading attitude must decompose to (roll=0, pitch=0, heading<0),
+    // NOT the equivalent (roll=pi, pitch=pi, heading+pi) branch that Eigen::eulerAngles(2,1,0) returns
+    // by forcing the first angle into [0, pi]. This is the crab case that broke the attitude readout.
+    const float h = -9.5f * static_cast<float>(M_PI) / 180.0f;
+    const KinematicStateSnapshot s =
+        makeSnapshot(Eigen::Quaternionf(Eigen::AngleAxisf(h, Eigen::Vector3f::UnitZ())));
+    EXPECT_NEAR(KSU::roll_rad(s),    0.0f, 1e-4f);
+    EXPECT_NEAR(KSU::pitch_rad(s),   0.0f, 1e-4f);
+    EXPECT_NEAR(KSU::heading_rad(s), h,    1e-4f);
+}
+
+TEST(KinematicStateSnapshotTest, EulerExtractionAllQuadrantsRoundTrip) {
+    // The 3-2-1 extraction must recover (roll, pitch, heading) for EVERY quadrant combination — all
+    // four sign quadrants of heading and roll, and pitch across (-pi/2, pi/2). Pitch is selected in
+    // [-pi/2, pi/2] by asin (correct-solution selection, not limiting); heading/roll are resolved to
+    // (-pi, pi] by atan2. This is the coverage that catches wrong-branch selection.
+    const float d2r = static_cast<float>(M_PI) / 180.0f;
+    const float halfpi = static_cast<float>(M_PI) / 2.0f;
+    const float yaw_roll[] = {-170.f, -135.f, -90.f, -45.f, -10.f, 0.f, 10.f, 45.f, 90.f, 135.f, 180.f};
+    const float pitches[]  = {-85.f, -60.f, -45.f, -20.f, -5.f, 0.f, 5.f, 20.f, 45.f, 60.f, 85.f};
+    auto wrapdiff = [](float a, float b) {
+        float d = a - b;
+        while (d >   static_cast<float>(M_PI)) d -= 2.0f * static_cast<float>(M_PI);
+        while (d <= -static_cast<float>(M_PI)) d += 2.0f * static_cast<float>(M_PI);
+        return std::abs(d);
+    };
+    for (float hd : yaw_roll) for (float pd : pitches) for (float rd : yaw_roll) {
+        const float h = hd * d2r, p = pd * d2r, r = rd * d2r;
+        const Eigen::Quaternionf q_nb =
+            Eigen::AngleAxisf(h, Eigen::Vector3f::UnitZ()) *
+            Eigen::AngleAxisf(p, Eigen::Vector3f::UnitY()) *
+            Eigen::AngleAxisf(r, Eigen::Vector3f::UnitX());
+        const KinematicStateSnapshot s = makeSnapshot(q_nb);   // alpha=beta=0 => q_nb == q_nw
+        const float re = KSU::roll_rad(s), pe = KSU::pitch_rad(s), he = KSU::heading_rad(s);
+        SCOPED_TRACE("h=" + std::to_string(hd) + " p=" + std::to_string(pd) + " r=" + std::to_string(rd));
+        EXPECT_LE(std::abs(pe), halfpi + 1e-4f);           // pitch never exceeds pi/2
+        // Euler -> q -> Euler: the extraction recovers the input angles.
+        EXPECT_NEAR(pe, p, 2e-4f);                          // pitch recovered
+        EXPECT_LT(wrapdiff(re, r), 2e-4f);                 // roll recovered mod 2pi
+        EXPECT_LT(wrapdiff(he, h), 2e-4f);                 // heading recovered mod 2pi
+        // q -> Euler -> q: the extracted angles reconstruct the SAME rotation (matrix compare handles
+        // the +-q double cover and the +-pi wrap of heading/roll uniformly).
+        const Eigen::Quaternionf q_re =
+            Eigen::AngleAxisf(he, Eigen::Vector3f::UnitZ()) *
+            Eigen::AngleAxisf(pe, Eigen::Vector3f::UnitY()) *
+            Eigen::AngleAxisf(re, Eigen::Vector3f::UnitX());
+        EXPECT_TRUE(q_re.toRotationMatrix().isApprox(q_nb.toRotationMatrix(), 1e-4f));
+    }
+}
+
+TEST(KinematicStateSnapshotTest, EulerExtractionRandomQuaternionRoundTrip) {
+    // q -> Euler -> q for ARBITRARY (uniformly random) quaternions, not just clean Euler grids: the
+    // extracted 3-2-1 angles must reconstruct the same rotation, with pitch always in [-pi/2, pi/2].
+    std::mt19937 rng(0xC0FFEE);
+    std::uniform_real_distribution<float> u(-1.0f, 1.0f);
+    const float halfpi = static_cast<float>(M_PI) / 2.0f;
+    int tested = 0;
+    for (int i = 0; i < 5000 && tested < 3000; ++i) {
+        Eigen::Quaternionf q(u(rng), u(rng), u(rng), u(rng));
+        if (q.norm() < 1e-2f) continue;                    // reject near-zero before normalizing
+        q.normalize();
+        ++tested;
+        const KinematicStateSnapshot s = makeSnapshot(q);  // alpha=beta=0 => q_nb == q
+        const float re = KSU::roll_rad(s), pe = KSU::pitch_rad(s), he = KSU::heading_rad(s);
+        EXPECT_LE(std::abs(pe), halfpi + 1e-4f) << "i=" << i;
+        const Eigen::Quaternionf q_re =
+            Eigen::AngleAxisf(he, Eigen::Vector3f::UnitZ()) *
+            Eigen::AngleAxisf(pe, Eigen::Vector3f::UnitY()) *
+            Eigen::AngleAxisf(re, Eigen::Vector3f::UnitX());
+        EXPECT_TRUE(q_re.toRotationMatrix().isApprox(q.toRotationMatrix(), 1e-4f)) << "i=" << i;
+    }
+    EXPECT_GT(tested, 2900);
+}
+
+TEST(KinematicStateSnapshotTest, EulerExtractionGimbalLockPitchNinety) {
+    // At pitch = +-pi/2 (gimbal lock) roll and heading are not separately observable; the extraction
+    // must still return pitch = +-pi/2 (correct solution, not a flip) and finite roll/heading.
+    for (float sgn : {1.0f, -1.0f}) {
+        const float p = sgn * static_cast<float>(M_PI) / 2.0f;
+        const KinematicStateSnapshot s =
+            makeSnapshot(Eigen::Quaternionf(Eigen::AngleAxisf(p, Eigen::Vector3f::UnitY())));
+        EXPECT_NEAR(KSU::pitch_rad(s), p, 1e-3f);
+        EXPECT_TRUE(std::isfinite(KSU::roll_rad(s)));
+        EXPECT_TRUE(std::isfinite(KSU::heading_rad(s)));
+    }
 }
 
 // ---------------------------------------------------------------------------

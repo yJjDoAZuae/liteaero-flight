@@ -2,6 +2,7 @@
 #include <liteaero/nav/KinematicStateUtil.hpp>
 #include <liteaero/nav/WGS84.hpp>
 #include <liteaero_flight.pb.h>
+#include <algorithm>
 #include <cmath>
 #include <stdexcept>
 
@@ -68,9 +69,17 @@ Eigen::Quaternionf q_nl(const KinematicStateSnapshot& s)
 
 Eigen::Vector3f roll_pitch_heading(const KinematicStateSnapshot& s)
 {
-    // ZYX decomposition of q_nb: eulerAngles(2,1,0) returns [yaw, pitch, roll]
-    const Eigen::Vector3f ypr = q_nb(s).toRotationMatrix().eulerAngles(2, 1, 0);
-    return {ypr(2), ypr(1), ypr(0)};  // [roll, pitch, heading]
+    // Aerospace 3-2-1 (ZYX) extraction of q_nb = Rz(heading)·Ry(pitch)·Rx(roll), solved directly.
+    // NOT via Eigen::eulerAngles(2,1,0): that convention forces the first angle into [0, π] and, for a
+    // heading in [-π, 0), returns the equivalent-but-flipped |pitch| > π/2 branch (e.g. a level −9.5°
+    // crab reads as pitch = roll = 180°). asin keeps pitch in [-π/2, π/2] by correct solution
+    // selection (not limiting); atan2 resolves all quadrants for heading and roll. The only
+    // singularity is pitch = ±π/2 (gimbal lock), where roll is not separately observable.
+    const Eigen::Matrix3f R = q_nb(s).toRotationMatrix();   // body → NED
+    const float pitch   = std::asin(std::clamp(-R(2, 0), -1.0f, 1.0f));
+    const float roll    = std::atan2(R(2, 1), R(2, 2));
+    const float heading = std::atan2(R(1, 0), R(0, 0));
+    return {roll, pitch, heading};  // [roll, pitch, heading]
 }
 
 float roll_rad(const KinematicStateSnapshot& s)
@@ -86,6 +95,19 @@ float pitch_rad(const KinematicStateSnapshot& s)
 float heading_rad(const KinematicStateSnapshot& s)
 {
     return roll_pitch_heading(s)(2);
+}
+
+float ground_track_azimuth_rad(const KinematicStateSnapshot& s)
+{
+    return std::atan2(s.velocity_ned_mps.y(), s.velocity_ned_mps.x());
+}
+
+float air_track_azimuth_rad(const KinematicStateSnapshot& s)
+{
+    // OQ-AC-4: airspeed azimuth χ_a = atan2 of v_a = v_g − wind (equal to q_nw's forward azimuth when
+    // coordinated, since q_nw tracks the airspeed). Kinematic form keeps χ_a − χ_g == crab_rad exactly.
+    const Eigen::Vector3f v_aero = s.velocity_ned_mps - s.wind_ned_mps;
+    return std::atan2(v_aero(1), v_aero(0));
 }
 
 Eigen::Vector3f euler_rates_rad_s(const KinematicStateSnapshot& s)

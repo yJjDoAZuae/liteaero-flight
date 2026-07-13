@@ -55,12 +55,21 @@ float roll_rad(const KinematicStateSnapshot& s);
 /// Pitch angle, radians. Singularity at ±π/2.
 float pitch_rad(const KinematicStateSnapshot& s);
 
-/// Heading/yaw angle, radians [0, 2π).
+/// Heading/yaw angle, radians (−π, π].
 float heading_rad(const KinematicStateSnapshot& s);
 
 /// Euler rates [roll_rate, pitch_rate, heading_rate], rad/s.
 /// Returns zero vector when pitch is within 1e-6 rad of ±π/2 (gimbal-lock guard).
 Eigen::Vector3f euler_rates_rad_s(const KinematicStateSnapshot& s);
+
+/// Ground-track azimuth χ_g = atan2(v_gE, v_gN), radians (−π, π] — the ground velocity-azimuth
+/// local-level frame's azimuth (OQ-AC-4). See crab_rad() below for the crab χ_a − χ_g.
+float ground_track_azimuth_rad(const KinematicStateSnapshot& s);
+
+/// Air-track azimuth χ_a = atan2 of (v_g − wind), radians (−π, π] — the aero velocity-azimuth
+/// local-level frame's azimuth (= q_nw's forward azimuth when coordinated, since q_nw tracks the
+/// airspeed, OQ-AC-4).
+float air_track_azimuth_rad(const KinematicStateSnapshot& s);
 
 
 // ---------------------------------------------------------------------------
